@@ -1885,19 +1885,18 @@
             left: 0;
             height: 100%;
             width: 100%;
-            background:  #A020F0;
+            background: #A020F0;
             transition: width 0.5s ease-in-out;
         }
         
         .texto-barra-aether { 
-            position: relative;
+            position: absolute;
             width: 100%;
             text-align: center;
             color: #FFFFFF;
             font-size: 13px;
             font-family: Arial; 
             font-weight: bold;    
-            z-index: 2;
             line-height: 25px;
         }
         
