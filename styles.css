@@ -1869,18 +1869,31 @@
             flex-direction: column;
             align-items: center;
         }
-        
+
         .barra-aether {
             width: 400px;
             height: 25px;
-            border: 1px solid #1E1E2E;
-            background: #A020F0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px solid #FFFFFF;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preenchimento-aether {
+            height: 100%;
+            background:  #A020F0;
+            width: 0%; 
+            transition: width 0.5s ease;
+        }
+        
+        .texto-barra-aether {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
             color: #FFFFFF;
             font-size: 13px;
             font-family: Arial;    
+            transform: translateY(-50%);
         }
         
         .tipo-aether {
