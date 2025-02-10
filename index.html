@@ -1139,7 +1139,8 @@
             <!-- Bloco Barra Aether -->
             <div class="bloco-barra">
                 <div class="barra-aether">
-                    <span class="texto-barra">Aether: 101%</span>
+                    <div class="preenchimento-aether" id="preenchimentoAether"></div>
+                    <span class="texto-barra-aether" id="textoAether">Aether: 101%</span>
                 </div>
                 <p class="tipo-aether">Tipo: Bruto</p>
             </div>
@@ -1853,7 +1854,7 @@
         textoEA.textContent = `EA: ${porcentagem}%`;
     }
     
-    // Exemplo: Definir a porcentagem inicial para 100%
+    // Exemplo: Definir a porcentagem inicial 
     document.addEventListener('DOMContentLoaded', () => {
         atualizarEA(53);
     });
@@ -1974,6 +1975,26 @@
     atualizarStatusTemporarias('grupo-tedio', 0);
     atualizarStatusTemporarias('grupo-raiva', 0);
     atualizarStatusTemporarias('grupo-desgaste', 0);
+
+     // Barra Aether
+    function atualizarEA(porcentagem) {
+        const barraAether = document.getElementById('preenchimentoAether');
+        const textoAether = document.getElementById('textoAether');
+    
+        // Garante que a porcentagem fique entre 0% e 102%
+        porcentagem = Math.max(0, Math.min(102, porcentagem));
+    
+        // Atualiza a largura da barra
+        barraEA.style.width = `${porcentagem}%`;
+    
+        // Atualiza o texto dentro da barra
+        textoAether.textContent = `Aether: ${porcentagem}%`;
+    }
+    
+    // Exemplo: Definir a porcentagem inicial
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarEA(101);
+    });
     
 </script>
 
