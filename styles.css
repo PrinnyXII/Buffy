@@ -1870,30 +1870,35 @@
             align-items: center;
         }
 
-        .barra-aether {
+        .barra-aether {   
             width: 400px;
             height: 25px;
             border: 1px solid #FFFFFF;
             position: relative;
+            argin: 0 auto;    
             overflow: hidden;
         }
         
         .preenchimento-aether {
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
+            width: 100%;
             background:  #A020F0;
-            width: 0%; 
-            transition: width 0.5s ease;
+            transition: width 0.5s ease-in-out;
         }
         
-        .texto-barra-aether {
-            position: absolute;
+        .texto-barra-aether { 
+            position: relative;
             width: 100%;
             text-align: center;
-            font-size: 14px;
             color: #FFFFFF;
             font-size: 13px;
-            font-family: Arial;    
-            transform: translateY(-50%);
+            font-family: Arial; 
+            font-weight: bold;    
+            z-index: 2;
+            line-height: 25px;
         }
         
         .tipo-aether {
