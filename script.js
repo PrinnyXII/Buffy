@@ -11,23 +11,46 @@
     }
 
     // Buffy Música - Inicia o player assim que a página carrega, mantendo a música tocando mesmo ao fechar a janela
-    document.addEventListener("DOMContentLoaded", function() {
-        const playerMusica = document.querySelector("#janelaMusica iframe");
-        playerMusica.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH&color=%23a020f0&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true";
-    });
-    
-    // Barra de Experiência
-    function updateExpBar(percentage) {
-    var progressBar = document.getElementById('expBar');
-    progressBar.style.width = percentage + '%';
-  
-    //  Barra de Experiência - Texto bonitinho
-    var textSpan = document.querySelector('.barra-texto');
-        textSpan.textContent = '1303 - ' + percentage + '%'; // Define o texto
+    function loadSection(id, url, callback) {
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                if (callback) callback(); // Executa o código após o carregamento
+            })
+            .catch(error => console.error('Erro ao carregar a seção:', error));
     }
 
-    //  Barra de Experiência - Porcentagem
-    updateExpBar(73);
+    // Carregar a seção da música e configurar o player
+    loadSection("secao-musica", "Seções/1-Aura Buffy.html", function () {
+        const playerMusica = document.querySelector("#janelaMusica iframe");
+        if (playerMusica) {
+            playerMusica.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
+        } else {
+            console.error("O elemento #janelaMusica iframe não foi encontrado.");
+        }
+    });
+
+    // Barra de Experiência
+    loadSection("secao-exp", "Seções/4-Barra e Dinheiro.html", function () {
+        function updateExpBar(percentage) {
+            var progressBar = document.getElementById('expBar');
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+    
+                // Atualizar o texto da barra
+                var textSpan = document.querySelector('.barra-texto');
+                if (textSpan) {
+                    textSpan.textContent = '1303 - ' + percentage + '%';
+                }
+            } else {
+                console.error("Elemento 'expBar' não encontrado.");
+            }
+        }
+    
+        // Atualiza a barra de experiência
+        updateExpBar(73);
+    });
 
     // Classes - Texto retraído
     function mostrarTexto() {
@@ -840,3 +863,15 @@
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
     loadSection("secao-bahdinheiro", "Seções/4-Barra e Dinheiro.html");
     loadSection("secao-classes", "Seções/5-Classes.html");
+
+    // 
+    function loadSection(id, url, callback) {
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                if (callback) callback(); // Executa o código após o carregamento
+            })
+            .catch(error => console.error('Erro ao carregar a seção:', error));
+    }
+
