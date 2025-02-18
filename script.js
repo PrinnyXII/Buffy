@@ -835,4 +835,4 @@
     }
     
     // Carregar todas as seções
-    loadSection("secao-aura", "Seções/Aura Buffy.html");
+    loadSection("secao-aura", "Seções/1-Aura Buffy.html");
