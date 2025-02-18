@@ -22,7 +22,7 @@
     }
 
     // Carregar a seção da música e configurar o player
-    loadSection("secao-musica", "Seções/1-Aura Buffy.html", function () {
+    loadSection("secao-aura", "Seções/1-Aura Buffy.html", function () {
         const playerMusica = document.querySelector("#janelaMusica iframe");
         if (playerMusica) {
             playerMusica.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
@@ -32,7 +32,7 @@
     });
 
     // Barra de Experiência
-    loadSection("secao-exp", "Seções/4-Barra e Dinheiro.html", function () {
+    loadSection("secao-bahdinheiro", "Seções/4-Barra e Dinheiro.html", function () {
         function updateExpBar(percentage) {
             var progressBar = document.getElementById('expBar');
             if (progressBar) {
