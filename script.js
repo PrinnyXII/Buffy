@@ -42,9 +42,11 @@
     });
 
     // Classes - Texto retraído
-    function mostrarTexto() {
-        const expandido = document.querySelector('.expandido');
-        expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
+    loadSection("secao-classes", "Seções/5-Classes.html", function () {
+        function mostrarTexto() {
+            const expandido = document.querySelector('.expandido');
+            expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
+        }
     }
 
     // Caracteristicas
