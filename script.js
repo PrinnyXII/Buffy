@@ -838,3 +838,4 @@
     loadSection("secao-aura", "Seções/1-Aura Buffy.html");
     loadSection("secao-assimilacao", "Seções/2-Taxa de Assimilação.html");
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
+    loadSection("secao-barra-e-dinheiro", "Seções/4-Barra Exp. e Dinheiro.html");
