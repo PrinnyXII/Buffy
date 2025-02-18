@@ -11,7 +11,7 @@
     }
 
     // Carregar a seção da música e configurar o player
-    loadSection("secao-aura", "Seções/1-Aura Buffy.html", function () {
+    loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
         const playerMusica = document.querySelector("#janelaMusica iframe");
         if (playerMusica) {
             playerMusica.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
@@ -21,7 +21,7 @@
     });
 
     // Barra de Experiência
-    loadSection("secao-bahdinheiro", "4-Barra e Dinheiro.html", function () {
+    loadSection("secao-bahdinheiro", "4-Barra-e-Dinheiro.html", function () {
         console.log("Seção Barra de Experiência carregada!");
     
         function updateExpBar(percentage) {
@@ -857,10 +857,10 @@
     }
     
     // Carregar todas as seções
-    loadSection("secao-aura", "Seções/1-Aura Buffy.html");
-    loadSection("secao-assimilacao", "Seções/2-Taxa de Assimilação.html");
+    loadSection("secao-aura", "Seções/1-Aura-Buffy.html");
+    loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html");
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
-    loadSection("secao-bahdinheiro", "Seções/4-Barra e Dinheiro.html");
+    loadSection("secao-bahdinheiro", "Seções/4-Barra-e-Dinheiro.html");
     loadSection("secao-classes", "Seções/5-Classes.html");
 
     // 
