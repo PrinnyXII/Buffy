@@ -10,17 +10,6 @@
         }
     }
 
-    // Buffy Música - Inicia o player assim que a página carrega, mantendo a música tocando mesmo ao fechar a janela
-    function loadSection(id, url, callback) {
-        fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById(id).innerHTML = data;
-                if (callback) callback(); // Executa o código após o carregamento
-            })
-            .catch(error => console.error('Erro ao carregar a seção:', error));
-    }
-
     // Carregar a seção da música e configurar o player
     loadSection("secao-aura", "Seções/1-Aura Buffy.html", function () {
         const playerMusica = document.querySelector("#janelaMusica iframe");
