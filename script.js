@@ -837,3 +837,4 @@
     // Carregar todas as seções
     loadSection("secao-aura", "Seções/1-Aura Buffy.html");
     loadSection("secao-assimilacao", "Seções/2-Taxa de Assimilação.html");
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
