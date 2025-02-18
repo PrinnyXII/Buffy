@@ -21,7 +21,9 @@
     });
 
     // Barra de Experiência
-    loadSection("secao-bahdinheiro", "Seções/4-Barra e Dinheiro.html", function () {
+    loadSection("secao-bahdinheiro", "4-Barra e Dinheiro.html", function () {
+        console.log("Seção Barra de Experiência carregada!");
+    
         function updateExpBar(percentage) {
             var progressBar = document.getElementById('expBar');
             if (progressBar) {
