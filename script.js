@@ -43,9 +43,15 @@
 
     // Classes - Texto retraído
     loadSection("secao-classes", "Seções/5-Classes.html", function () {
-        function mostrarTexto() {
-            const expandido = document.querySelector('.expandido');
+        console.log("Seção Classes carregada!");
+    });
+    
+    function mostrarTexto() {
+        const expandido = document.querySelector('.expandido');
+        if (expandido) {
             expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
+        } else {
+            console.error("Elemento '.expandido' não encontrado!");
         }
     }
 
