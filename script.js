@@ -823,3 +823,16 @@
     
     // Chamada inicial para atualizar a barra ao carregar a página
     atualizarAether(porcentagemAether);
+
+    // Seções Individuais
+    function loadSection(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+            })
+            .catch(error => console.error(`Erro ao carregar ${file}:`, error));
+    }
+    
+    // Carregar todas as seções
+    loadSection("secao-aura", "Seções/Aura Buffy.html");
