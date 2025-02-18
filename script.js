@@ -839,3 +839,4 @@
     loadSection("secao-assimilacao", "Seções/2-Taxa de Assimilação.html");
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
     loadSection("secao-bahdinheiro", "Seções/4-Barra e Dinheiro.html");
+    loadSection("secao-classes", "Seções/5-Classes.html");
