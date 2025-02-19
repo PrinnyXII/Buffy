@@ -24,9 +24,10 @@
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
         console.log("Seção Barra de Experiência carregada!");
     
-        function updateExpBar(percentage) {
+        setTimeout(() => {
             var progressBar = document.getElementById('expBar');
             if (progressBar) {
+                var percentage = 73; // 
                 progressBar.style.width = percentage + '%';
     
                 // Atualizar o texto da barra
@@ -37,10 +38,7 @@
             } else {
                 console.error("Elemento 'expBar' não encontrado.");
             }
-        }
-    
-        // Atualiza a barra de experiência
-        updateExpBar(73);
+        }, 500); 
     });
 
     // Classes - Texto retraído
