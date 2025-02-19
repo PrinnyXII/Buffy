@@ -57,8 +57,17 @@
 
     // Caracteristicas
     loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
-    console.log("Seção Características carregada!");
+        console.log("Seção Características carregada!");
+    
+        document.getElementById('botaoProfissao')?.addEventListener("click", toggleProfissao);
+    
+        document.getElementById('botaoEstadoCivil')?.addEventListener("click", abrirJanelaEstadoCivil);
+        document.getElementById('fecharEstadoCivil')?.addEventListener("click", fecharJanelaEstadoCivil);
         
+        atualizarBarra('barra-autoestima', 'texto-autoestima', 99);
+        atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
+    });
+            
     function toggleProfissao() {
         const detalhes = document.getElementById('detalhesProfissao');
         if (detalhes.style.display === 'none' || detalhes.style.display === '') {
