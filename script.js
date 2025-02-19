@@ -202,7 +202,6 @@
         const musicaAtual = listaDeMusicas.find((musica) => 
             musica.nome === document.querySelector('.nome-musica-isaac').textContent
         );
-    
         if (musicaAtual) {
             if (musicasFavoritadas[musicaAtual.id]) {
                 delete musicasFavoritadas[musicaAtual.id]; 
