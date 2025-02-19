@@ -242,6 +242,11 @@
     });
     
     // Atualiza o tempo total quando os metadados da música são carregados
+    function formatarTempo(segundos) {
+        const minutos = Math.floor(segundos / 60);
+        const restoSegundos = Math.floor(segundos % 60);
+        return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
+    }
     audio.addEventListener('loadedmetadata', () => {
         tempoTotal.textContent = formatarTempo(audio.duration);
     });
