@@ -169,7 +169,28 @@
             atualizarFavoritoVisual(id);
         }
     }
+
+    // Adicionar eventos à lista de músicas
+    document.querySelectorAll('.lista-musicas-isaac p').forEach((item, index) => {
+        item.addEventListener('click', () => selecionarMusica(index + 1));
+    });
     
+    // Função para abrir/fechar a lista de músicas
+    function toggleLista() {
+        const lista = document.getElementById('listaMusicas');
+        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
+    }
+    
+    // Função para retroceder 10 segundos
+    function retroceder10s() {
+        audio.currentTime = Math.max(0, audio.currentTime - 10);
+    }
+    
+    // Função para avançar 10 segundos
+    function avancar10s() {
+        audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+    }
+
     // Função para play/pause
     function playPause() {
         if (musicaTocando) {
@@ -186,7 +207,29 @@
         const botaoPlay = document.querySelector('.botao-controle-isaac:nth-child(2)');
         botaoPlay.textContent = musicaTocando ? 'II' : '►';
     }
+
+    // Favoritar e salvar estado
+    const storageKey = 'musicasFavoritadas';
+    let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
     
+    function atualizarFavoritoVisual(id) {
+        const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
+        if (musicasFavoritadas[id]) {
+            botaoFavoritar.classList.add('favoritado');
+            botaoFavoritar.textContent = '💖';
+        } else {
+            botaoFavoritar.classList.remove('favoritado');
+            botaoFavoritar.textContent = '🤍';
+        }
+    }
+    
+    function favoritarMusica() {
+        const musicaAtual = listaDeMusicas.find((musica) => musica.nome === document.querySelector('.nome-musica-isaac').textContent);
+        musicasFavoritadas[musicaAtual.id] = !musicasFavoritadas[musicaAtual.id];
+        atualizarFavoritoVisual(musicaAtual.id);
+        localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
+    }
+
     // Atualiza o progresso e tempo da música
     audio.addEventListener('timeupdate', () => {
         const tempo = formatarTempo(audio.currentTime);
