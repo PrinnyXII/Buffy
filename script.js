@@ -56,6 +56,9 @@
     }
 
     // Caracteristicas
+    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
+    console.log("Seção Características carregada!");
+        
     function toggleProfissao() {
         const detalhes = document.getElementById('detalhesProfissao');
         if (detalhes.style.display === 'none' || detalhes.style.display === '') {
