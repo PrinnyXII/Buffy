@@ -132,26 +132,20 @@
             autor: "Kurae Radiânthia Pendragon Isaac",
             capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true",
             background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true",
-            link: "https://github.com/PrinnyXII/st/blob/main/rep/Isaac/CryingAlone-Nowhere.mp3",
+            link: "https://github.com/PrinnyXII/st/raw/main/rep/Isaac/CryingAlone-Nowhere.mp3",
         }
     ];
     
-    // Controle do Player de Música
+    // Capturar elementos corretamente
     const playerMusica = document.querySelector('.player-musica-isaac');
-    const audio = document.querySelector('audio');
+    const audio = document.querySelector('#audio-player');
+    const audioSource = document.querySelector('#audio-player source');
     const progressBar = document.getElementById('progress-bar');
     const tempoAtual = document.getElementById('tempo-atual');
     const tempoTotal = document.getElementById('tempo-total');
     let musicaTocando = false;
     
-    // Áudio clique
-    document.body.addEventListener('click', () => {
-        if (!musicaTocando) {
-            audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
-        }
-    }, { once: true }); // Apenas uma vez
-    
-    // Selecionar música da lista
+    // Carregar uma música corretamente
     function selecionarMusica(id) {
         const musicaSelecionada = listaDeMusicas.find((musica) => musica.id === id);
     
@@ -159,39 +153,44 @@
             document.querySelector('.nome-musica-isaac').textContent = musicaSelecionada.nome;
             document.querySelector('.autor-musica-isaac').textContent = musicaSelecionada.autor;
             document.querySelector('.capa-musica-isaac img').src = musicaSelecionada.capa;
-            document.querySelector('.player-musica-isaac').style.backgroundImage = 
+            document.querySelector('.player-musica-isaac').style.backgroundImage =
                 `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-            document.querySelector('#audio-player source').src = musicaSelecionada.link;
+            
+            // **Correção: Atualizar a fonte do áudio corretamente**
+            audioSource.src = musicaSelecionada.link;
+            audio.load(); // Recarregar o áudio após mudar o `src`
     
-            audio.load();
-            musicaTocando = true;
-            atualizarBotaoPlay();
-            atualizarFavoritoVisual(id);
+            audio.oncanplaythrough = () => { 
+                audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
+                musicaTocando = true;
+                atualizarBotaoPlay();
+                atualizarFavoritoVisual(id);
+            };
         }
     }
-
-    // Adicionar eventos à lista de músicas
-    document.querySelectorAll('.lista-musicas-isaac p').forEach((item, index) => {
-        item.addEventListener('click', () => selecionarMusica(index + 1));
+    
+    // Atualizar barra de progresso corretamente
+    progressBar.addEventListener('input', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = (progressBar.value / 100) * audio.duration;
+        } else {
+            console.warn("A duração do áudio ainda não está carregada.");
+        }
     });
     
-    // Função para abrir/fechar a lista de músicas
-    function toggleLista() {
-        const lista = document.getElementById('listaMusicas');
-        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
-    }
-    
-    // Função para retroceder 10 segundos
+    // Botões do Player
     function retroceder10s() {
-        audio.currentTime = Math.max(0, audio.currentTime - 10);
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
+        }
     }
     
-    // Função para avançar 10 segundos
     function avancar10s() {
-        audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        }
     }
-
-    // Função para play/pause
+    
     function playPause() {
         if (musicaTocando) {
             audio.pause();
@@ -207,62 +206,46 @@
         const botaoPlay = document.querySelector('.botao-controle-isaac:nth-child(2)');
         botaoPlay.textContent = musicaTocando ? 'II' : '►';
     }
-
-    // Favoritar e salvar estado
-    const storageKey = 'musicasFavoritadas';
-    let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
     
     function atualizarFavoritoVisual(id) {
         const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
-        if (musicasFavoritadas[id]) {
-            botaoFavoritar.classList.add('favoritado');
-            botaoFavoritar.textContent = '💖';
-        } else {
-            botaoFavoritar.classList.remove('favoritado');
-            botaoFavoritar.textContent = '🤍';
+        if (botaoFavoritar) {
+            if (musicasFavoritadas[id]) {
+                botaoFavoritar.classList.add('favoritado');
+                botaoFavoritar.textContent = '💖';
+            } else {
+                botaoFavoritar.classList.remove('favoritado');
+                botaoFavoritar.textContent = '🤍';
+            }
         }
     }
     
-    function favoritarMusica() {
-        const musicaAtual = listaDeMusicas.find((musica) => musica.nome === document.querySelector('.nome-musica-isaac').textContent);
-        musicasFavoritadas[musicaAtual.id] = !musicasFavoritadas[musicaAtual.id];
-        atualizarFavoritoVisual(musicaAtual.id);
-        localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
-    }
-
-    // Atualiza o progresso e tempo da música
+    // Atualizar progresso da música
     audio.addEventListener('timeupdate', () => {
-        const tempo = formatarTempo(audio.currentTime);
-        tempoAtual.textContent = tempo;
-        progressBar.value = (audio.currentTime / audio.duration) * 100;
-    });
-    
-    progressBar.addEventListener('input', () => {
-        audio.currentTime = (progressBar.value / 100) * audio.duration;
-    });
-    
-    // Tempo
-    progressBar.addEventListener('input', () => {
-        if (!isNaN(audio.duration) && isFinite(audio.duration)) { 
-            audio.currentTime = (progressBar.value / 100) * audio.duration;
-        } else {
-            console.warn("A duração do áudio ainda não está carregada.");
+        if (!isNaN(audio.currentTime) && isFinite(audio.currentTime)) {
+            tempoAtual.textContent = formatarTempo(audio.currentTime);
+            progressBar.value = (audio.currentTime / audio.duration) * 100;
         }
     });
-
+    
+    // Atualizar tempo total quando a música carregar
+    audio.addEventListener('loadedmetadata', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            tempoTotal.textContent = formatarTempo(audio.duration);
+        }
+    });
+    
+    // Formatar tempo
     function formatarTempo(segundos) {
         const minutos = Math.floor(segundos / 60);
         const restoSegundos = Math.floor(segundos % 60);
         return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
     }
-    audio.addEventListener('loadedmetadata', () => {
-        tempoTotal.textContent = formatarTempo(audio.duration);
-    });
     
-    // Atualizar nomes na lista de músicas
+    // Atualizar a lista de músicas
     function atualizarListaMusicas() {
         const listaContainer = document.getElementById('listaMusicas');
-        listaContainer.innerHTML = ''; // Limpa a lista antes de recriá-la
+        listaContainer.innerHTML = '';
     
         listaDeMusicas.forEach((musica) => {
             const item = document.createElement('p');
@@ -272,14 +255,14 @@
         });
     }
     
-    // Carregar a primeira música após a página estar pronta
+    // Carregar primeira música ao iniciar
     document.addEventListener('DOMContentLoaded', () => {
         atualizarListaMusicas();
-        selecionarMusica(1); // Começa com a primeira música
+        selecionarMusica(1); // Carregar a primeira música
         document.getElementById('listaMusicas').style.display = 'none';
         atualizarBotaoPlay();
     });
-        
+
     // Fama/Moral - Barra de Progresso e Estado
     function atualizarBarra(idBarra, idTexto, porcentagem, idStatus = null) {
         const barra = document.getElementById(idBarra);
