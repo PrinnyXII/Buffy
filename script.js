@@ -132,7 +132,7 @@
             autor: "Kurae Radiânthia Pendragon Isaac",
             capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true",
             background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true",
-            link: "assets/musicas/Crying Alone - Nowhere - Memory Breaker.mp3",
+            link: "rep/Isaac/Musicas/CryingAlone-Nowhere.mp3",
         },
         {
             id: 2,
@@ -140,7 +140,7 @@
             autor: "Artista 2",
             capa: "https://imgur.com/ExemploCapa2.png",
             background: "https://imgur.com/ExemploBackground2.png",
-            link: "assets/musicas/Musica2.mp3",
+            link: "",
         },
         {
             id: 3,
@@ -148,7 +148,7 @@
             autor: "Artista 3",
             capa: "https://imgur.com/ExemploCapa3.png",
             background: "https://imgur.com/ExemploBackground3.png",
-            link: "assets/musicas/Musica3.mp3",
+            link: "",
         },
     ];
     
