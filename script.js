@@ -76,14 +76,17 @@
         document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
         document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
     
-        // Barras de Autoestima e Fama
-        atualizarBarra("barra-autoestima", "texto-autoestima", 99);
-        atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
-    
-        document.getElementById("playerMusicaIsaac")?.addEventListener("click", togglePlayerMusicaIsaac);
         document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
         document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
         document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
+    
+        atualizarBarra("barra-autoestima", "texto-autoestima", 99);
+        atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
+    
+        atualizarListaMusicas();
+        selecionarMusica(1); 
+        document.getElementById("listaMusicas").style.display = "none";
+        atualizarBotaoPlay();
     });
             
     // Profissão
@@ -135,12 +138,18 @@
     }
     
     function fecharPlayer() {
-        const player = document.getElementById('playerMusicaIsaac');
-        const estadoCivil = document.getElementById('janelaEstadoCivil');
+        const player = document.getElementById("playerMusicaIsaac");
+        const estadoCivil = document.getElementById("janelaEstadoCivil");
     
-        player.style.display = 'none';
-        estadoCivil.style.zIndex = '1000';
-        audio.pause();
+        if (player) {
+            player.style.display = "none";
+        }
+        if (estadoCivil) {
+            estadoCivil.style.zIndex = "1000";
+        }
+        if (audio) {
+            audio.pause();
+        }
         musicaTocando = false;
         atualizarBotaoPlay();
     }
@@ -194,9 +203,8 @@
             document.querySelector('.player-musica-isaac').style.backgroundImage =
                 `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
             
-            // **Correção: Atualizar a fonte do áudio corretamente**
             audioSource.src = musicaSelecionada.link;
-            audio.load(); // Recarregar o áudio após mudar o `src`
+            audio.load(); 
     
             audio.oncanplaythrough = () => { 
                 audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
@@ -209,8 +217,18 @@
 
     // Abrir/fechar a lista de músicas
     function toggleLista() {
-        const lista = document.getElementById('listaMusicas');
-        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
+        const lista = document.getElementById("listaMusicas");
+        
+        if (!lista) {
+            console.error("Lista de músicas não encontrada!");
+            return;
+        }
+    
+        lista.style.display = lista.style.display === "block" ? "none" : "block";
+    
+        if (lista.style.display === "block") {
+            atualizarListaMusicas(); 
+        }
     }
 
     // Favoritar Músicas
@@ -317,14 +335,6 @@
             listaContainer.appendChild(item);
         });
     }
-    
-    // Carregar primeira música ao iniciar
-    document.addEventListener('DOMContentLoaded', () => {
-        atualizarListaMusicas();
-        selecionarMusica(1); // Carregar a primeira música
-        document.getElementById('listaMusicas').style.display = 'none';
-        atualizarBotaoPlay();
-    });
 
     // Fama/Moral - Barra de Progresso e Estado
     function atualizarBarra(idBarra, idTexto, porcentagem, idStatus = null) {
