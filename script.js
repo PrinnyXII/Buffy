@@ -4,9 +4,9 @@
         const janela = document.getElementById('janelaMusica');
 
         if (janela.style.display === 'none' || janela.style.display === '') {
-            janela.style.display = 'block'; // Abre a janela
+            janela.style.display = 'block'; 
         } else {
-            janela.style.display = 'none'; // Fecha a janela
+            janela.style.display = 'none'; 
         }
     }
 
