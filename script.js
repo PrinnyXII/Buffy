@@ -68,12 +68,11 @@
         atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
     });
             
+    // Profissão
     function toggleProfissao() {
         const detalhes = document.getElementById('detalhesProfissao');
-        if (detalhes.style.display === 'none' || detalhes.style.display === '') {
-            detalhes.style.display = 'block';
-        } else {
-            detalhes.style.display = 'none';
+        if (detalhes) {
+            detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
         }
     }
     
@@ -81,19 +80,24 @@
     function abrirJanelaEstadoCivil() {
         const janela = document.getElementById("janelaEstadoCivil");
         const textoCasada = document.querySelector(".texto-clicavel-isaac");
-        const rect = textoCasada.getBoundingClientRect();
-        const offsetX = window.pageXOffset || document.documentElement.scrollLeft;
-        const offsetY = window.pageYOffset || document.documentElement.scrollTop;
     
-        // Define a posição da janela flutuante
-        janela.style.left = `${rect.right + offsetX + 10}px`; // Ajuste para evitar sobreposição
-        janela.style.top = `${rect.top + offsetY}px`;
-        janela.style.display = "block"; // Torna a janela visível
+        if (janela && textoCasada) {
+            const rect = textoCasada.getBoundingClientRect();
+            const offsetX = window.pageXOffset || document.documentElement.scrollLeft;
+            const offsetY = window.pageYOffset || document.documentElement.scrollTop;
+    
+            // Define a posição da janela flutuante
+            janela.style.left = `${rect.right + offsetX + 10}px`;
+            janela.style.top = `${rect.top + offsetY}px`;
+            janela.style.display = "block";
+        }
     }
     
     function fecharJanelaEstadoCivil() {
         const janela = document.getElementById("janelaEstadoCivil");
-        janela.style.display = "none"; 
+        if (janela) {
+            janela.style.display = "none";
+        }
     }
     
     // Player de Música Isaac
@@ -308,52 +312,48 @@
     function atualizarBarra(idBarra, idTexto, porcentagem, idStatus = null) {
         const barra = document.getElementById(idBarra);
         const texto = document.getElementById(idTexto);
-        
-        // Atualiza a largura da barra e o texto central com a porcentagem
-        barra.style.width = `${porcentagem}%`;
-        texto.textContent = `${porcentagem}%`;
-
-        // Define cor baseada na porcentagem
-        let cor;
-        if (porcentagem <= 20) {
-            cor = 'darkred';
-        } else if (porcentagem <= 40) {
-            cor = '#FF9100';
-        } else if (porcentagem <= 60) {
-            cor = '#00D19A';
-        } else if (porcentagem <= 80) {
-            cor = '#D622EF';
-        } else {
-            cor = '#6222EF';
+    
+        if (barra && texto) {
+            // Atualiza a largura da barra e o texto central com a porcentagem
+            barra.style.width = `${porcentagem}%`;
+            texto.textContent = `${porcentagem}%`;
+    
+            // Define cor baseada na porcentagem
+            let cor;
+            if (porcentagem <= 20) {
+                cor = 'darkred';
+            } else if (porcentagem <= 40) {
+                cor = '#FF9100';
+            } else if (porcentagem <= 60) {
+                cor = '#00D19A';
+            } else if (porcentagem <= 80) {
+                cor = '#D622EF';
+            } else {
+                cor = '#6222EF';
+            }
+            barra.style.backgroundColor = cor;
         }
-        barra.style.backgroundColor = cor;
-
-        // Atualiza o status apenas se o ID de status for fornecido
+    
+        // Atualizar status apenas se um ID de status for fornecido
         if (idStatus) {
             const status = document.getElementById(idStatus);
-            let textoStatus;
-
-            if (porcentagem <= 20) {
-                textoStatus = 'Infame - Condenado - Vilão - Corrupto';
-            } else if (porcentagem <= 40) {
-                textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
-            } else if (porcentagem <= 60) {
-                textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
-            } else if (porcentagem <= 80) {
-                textoStatus = 'Respeitado - Admirado - Herói - Protetor';
-            } else {
-                textoStatus = 'Renomado - Lendário - Venerado - Salvador';
+            if (status) {
+                let textoStatus;
+                if (porcentagem <= 20) {
+                    textoStatus = 'Infame - Condenado - Vilão - Corrupto';
+                } else if (porcentagem <= 40) {
+                    textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
+                } else if (porcentagem <= 60) {
+                    textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
+                } else if (porcentagem <= 80) {
+                    textoStatus = 'Respeitado - Admirado - Herói - Protetor';
+                } else {
+                    textoStatus = 'Renomado - Lendário - Venerado - Salvador';
+                }
+                status.textContent = textoStatus;
             }
-
-            status.textContent = textoStatus;
         }
     }
-
-    // Autoestima - Atualiza apenas a cor e porcentagem
-    atualizarBarra('barra-autoestima', 'texto-autoestima', 99);
-
-    // Fama / Moral - Atualiza cor, porcentagem e status
-    atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
     
     // Títulos - Carrossel Automático
     let carrosselInterval;
