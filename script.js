@@ -21,7 +21,7 @@
     });
 
     // Cabeçalho - Seção 03
-    loadSection("secao-cabecalho", "Seções/2-Cabecalho.html", function () {
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
         console.log("Seção Cabeçalho carregada!");
     });
 
