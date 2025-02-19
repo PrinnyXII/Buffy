@@ -66,8 +66,8 @@
     }
 
     // Caracteristicas - Seção 06
-    loadSection("secao-categorias", "Seções/6-Categorias.html", function () {
-        console.log("Seção Categorias carregada!");
+    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
+        console.log("Seção Características carregada!");
     
         document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
         document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
