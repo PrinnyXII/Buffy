@@ -61,16 +61,23 @@
     }
 
     // Caracteristicas - Seção 06
-    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
-        console.log("Seção Características carregada!");
+    loadSection("secao-categorias", "Seções/6-Categorias.html", function () {
+        console.log("Seção Categorias carregada!");
     
-        document.getElementById('botaoProfissao')?.addEventListener("click", toggleProfissao);
+        document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
+        document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
+        document.getElementById("fecharEstadoCivil")?.addEventListener("click", fecharJanelaEstadoCivil);
+        document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
+        document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
     
-        document.getElementById('botaoEstadoCivil')?.addEventListener("click", abrirJanelaEstadoCivil);
-        document.getElementById('fecharEstadoCivil')?.addEventListener("click", fecharJanelaEstadoCivil);
-        
-        atualizarBarra('barra-autoestima', 'texto-autoestima', 99);
-        atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
+        // Barras de Autoestima e Fama
+        atualizarBarra("barra-autoestima", "texto-autoestima", 99);
+        atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
+    
+        document.getElementById("playerMusicaIsaac")?.addEventListener("click", togglePlayerMusicaIsaac);
+        document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
+        document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
+        document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
     });
             
     // Profissão
