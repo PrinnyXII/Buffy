@@ -83,7 +83,7 @@
     
     function fecharJanelaEstadoCivil() {
         const janela = document.getElementById("janelaEstadoCivil");
-        janela.style.display = "none"; // Oculta a janela
+        janela.style.display = "none"; 
     }
     
     // Player de Música Isaac
@@ -95,7 +95,7 @@
             player.style.display = 'flex';
             estadoCivil.style.zIndex = '900';
             centralizarElementosPlayer();
-            selecionarMusica(1); // Carregar a música 1 por padrão ao abrir
+            selecionarMusica(1);
         } else {
             player.style.display = 'none';
             estadoCivil.style.zIndex = '1000';
@@ -144,8 +144,14 @@
     const tempoAtual = document.getElementById('tempo-atual');
     const tempoTotal = document.getElementById('tempo-total');
     let musicaTocando = false;
-    
-    // Carregar uma música corretamente
+
+    // Botões sempre carregados
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".botao-favoritar-isaac").addEventListener("click", favoritarMusica);
+        document.querySelector(".botao-lista-musicas").addEventListener("click", toggleLista);
+    });
+
+    // Lista de Músicas
     function selecionarMusica(id) {
         const musicaSelecionada = listaDeMusicas.find((musica) => musica.id === id);
     
@@ -168,15 +174,36 @@
             };
         }
     }
+
+    // Abrir/fechar a lista de músicas
+    function toggleLista() {
+        const lista = document.getElementById('listaMusicas');
+        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // Favoritar Músicas
+    const storageKey = 'musicasFavoritadas';
+    let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
     
-    // Atualizar barra de progresso corretamente
-    progressBar.addEventListener('input', () => {
-        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
-            audio.currentTime = (progressBar.value / 100) * audio.duration;
-        } else {
-            console.warn("A duração do áudio ainda não está carregada.");
+    function atualizarFavoritoVisual(id) {
+        const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
+        if (botaoFavoritar) {
+            if (musicasFavoritadas[id]) {
+                botaoFavoritar.classList.add('favoritado');
+                botaoFavoritar.textContent = '💖';
+            } else {
+                botaoFavoritar.classList.remove('favoritado');
+                botaoFavoritar.textContent = '🤍';
+            }
         }
-    });
+    }
+    
+    function favoritarMusica() {
+        const musicaAtual = listaDeMusicas.find((musica) => musica.nome === document.querySelector('.nome-musica-isaac').textContent);
+        musicasFavoritadas[musicaAtual.id] = !musicasFavoritadas[musicaAtual.id];
+        atualizarFavoritoVisual(musicaAtual.id);
+        localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
+    }
     
     // Botões do Player
     function retroceder10s() {
@@ -206,20 +233,16 @@
         const botaoPlay = document.querySelector('.botao-controle-isaac:nth-child(2)');
         botaoPlay.textContent = musicaTocando ? 'II' : '►';
     }
-    
-    function atualizarFavoritoVisual(id) {
-        const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
-        if (botaoFavoritar) {
-            if (musicasFavoritadas[id]) {
-                botaoFavoritar.classList.add('favoritado');
-                botaoFavoritar.textContent = '💖';
-            } else {
-                botaoFavoritar.classList.remove('favoritado');
-                botaoFavoritar.textContent = '🤍';
-            }
+
+     // Atualizar barra de progresso corretamente
+    progressBar.addEventListener('input', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = (progressBar.value / 100) * audio.duration;
+        } else {
+            console.warn("A duração do áudio ainda não está carregada.");
         }
-    }
-    
+    });
+
     // Atualizar progresso da música
     audio.addEventListener('timeupdate', () => {
         if (!isNaN(audio.currentTime) && isFinite(audio.currentTime)) {
