@@ -868,6 +868,7 @@
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html");
     loadSection("secao-classes", "Seções/5-Classes.html");
+    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html");
 
     // 
     function loadSection(id, url, callback) {
