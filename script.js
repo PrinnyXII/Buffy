@@ -20,6 +20,11 @@
         }
     });
 
+    // Taxa Assimilação - Seção 02
+    loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html", function () {
+        console.log("Seção Taxa de Assimilação carregada!");
+    });
+
     // Cabeçalho - Seção 03
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
         console.log("Seção Cabeçalho carregada!");
