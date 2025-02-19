@@ -133,23 +133,7 @@
             capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true",
             background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true",
             link: "https://github.com/PrinnyXII/st/blob/7d4579c5969013f91eebc40b86c66129f0362925/rep/Isaac/CryingAlone-Nowhere.mp3",
-        },
-        {
-            id: 2,
-            nome: "Música 2",
-            autor: "Artista 2",
-            capa: "https://imgur.com/ExemploCapa2.png",
-            background: "https://imgur.com/ExemploBackground2.png",
-            link: "",
-        },
-        {
-            id: 3,
-            nome: "Música 3",
-            autor: "Artista 3",
-            capa: "https://imgur.com/ExemploCapa3.png",
-            background: "https://imgur.com/ExemploBackground3.png",
-            link: "",
-        },
+        }
     ];
     
     // Controle do Player de Música
@@ -159,6 +143,13 @@
     const tempoAtual = document.getElementById('tempo-atual');
     const tempoTotal = document.getElementById('tempo-total');
     let musicaTocando = false;
+    
+    // Áudio clique
+    document.body.addEventListener('click', () => {
+        if (!musicaTocando) {
+            audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
+        }
+    }, { once: true }); // Apenas uma vez
     
     // Selecionar música da lista
     function selecionarMusica(id) {
@@ -173,33 +164,10 @@
             document.querySelector('#audio-player source').src = musicaSelecionada.link;
     
             audio.load();
-            audio.play();
             musicaTocando = true;
             atualizarBotaoPlay();
-    
-            atualizarFavoritoVisual(id); // Atualiza favorito
+            atualizarFavoritoVisual(id);
         }
-    }
-    
-    // Adicionar eventos à lista de músicas
-    document.querySelectorAll('.lista-musicas-isaac p').forEach((item, index) => {
-        item.addEventListener('click', () => selecionarMusica(index + 1));
-    });
-    
-    // Função para abrir/fechar a lista de músicas
-    function toggleLista() {
-        const lista = document.getElementById('listaMusicas');
-        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
-    }
-    
-    // Função para retroceder 10 segundos
-    function retroceder10s() {
-        audio.currentTime = Math.max(0, audio.currentTime - 10);
-    }
-    
-    // Função para avançar 10 segundos
-    function avancar10s() {
-        audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
     }
     
     // Função para play/pause
@@ -208,7 +176,7 @@
             audio.pause();
             musicaTocando = false;
         } else {
-            audio.play();
+            audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
             musicaTocando = true;
         }
         atualizarBotaoPlay();
@@ -219,29 +187,7 @@
         botaoPlay.textContent = musicaTocando ? 'II' : '►';
     }
     
-    // Favoritar e salvar estado
-    const storageKey = 'musicasFavoritadas';
-    let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
-    
-    function atualizarFavoritoVisual(id) {
-        const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
-        if (musicasFavoritadas[id]) {
-            botaoFavoritar.classList.add('favoritado');
-            botaoFavoritar.textContent = '💖';
-        } else {
-            botaoFavoritar.classList.remove('favoritado');
-            botaoFavoritar.textContent = '🤍';
-        }
-    }
-    
-    function favoritarMusica() {
-        const musicaAtual = listaDeMusicas.find((musica) => musica.nome === document.querySelector('.nome-musica-isaac').textContent);
-        musicasFavoritadas[musicaAtual.id] = !musicasFavoritadas[musicaAtual.id];
-        atualizarFavoritoVisual(musicaAtual.id);
-        localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
-    }
-    
-    // Atualiza o progresso e tempo
+    // Atualiza o progresso e tempo da música
     audio.addEventListener('timeupdate', () => {
         const tempo = formatarTempo(audio.currentTime);
         tempoAtual.textContent = tempo;
@@ -252,17 +198,11 @@
         audio.currentTime = (progressBar.value / 100) * audio.duration;
     });
     
-    function formatarTempo(segundos) {
-        const minutos = Math.floor(segundos / 60);
-        const restoSegundos = Math.floor(segundos % 60);
-        return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
-    }
-    
     // Atualiza o tempo total quando os metadados da música são carregados
     audio.addEventListener('loadedmetadata', () => {
         tempoTotal.textContent = formatarTempo(audio.duration);
     });
-
+    
     // Atualizar nomes na lista de músicas
     function atualizarListaMusicas() {
         const listaContainer = document.getElementById('listaMusicas');
@@ -270,19 +210,17 @@
     
         listaDeMusicas.forEach((musica) => {
             const item = document.createElement('p');
-            item.textContent = musica.nome; // Nome sincronizado
-            item.addEventListener('click', () => selecionarMusica(musica.id)); // Seleciona a música ao clicar
+            item.textContent = musica.nome;
+            item.addEventListener('click', () => selecionarMusica(musica.id));
             listaContainer.appendChild(item);
         });
     }
     
-    // Carregar música inicial
+    // Carregar a primeira música após a página estar pronta
     document.addEventListener('DOMContentLoaded', () => {
-        musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
         atualizarListaMusicas();
-        selecionarMusica(1); // Selecionar música 1 ao carregar a página
-        const lista = document.getElementById('listaMusicas');
-        lista.style.display = 'none'; // Esconde a lista de músicas inicialmente
+        selecionarMusica(1); // Começa com a primeira música
+        document.getElementById('listaMusicas').style.display = 'none';
         atualizarBotaoPlay();
     });
         
