@@ -81,7 +81,7 @@
         document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
     
         atualizarBarra("barra-autoestima", "texto-autoestima", 99);
-        atualizarBarra("barra-fama", "texto-fama", 20, "status-fama");
+        atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
     
         atualizarListaMusicas();
         selecionarMusica(1); 
