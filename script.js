@@ -199,10 +199,19 @@
     }
     
     function favoritarMusica() {
-        const musicaAtual = listaDeMusicas.find((musica) => musica.nome === document.querySelector('.nome-musica-isaac').textContent);
-        musicasFavoritadas[musicaAtual.id] = !musicasFavoritadas[musicaAtual.id];
-        atualizarFavoritoVisual(musicaAtual.id);
-        localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
+        const musicaAtual = listaDeMusicas.find((musica) => 
+            musica.nome === document.querySelector('.nome-musica-isaac').textContent
+        );
+    
+        if (musicaAtual) {
+            if (musicasFavoritadas[musicaAtual.id]) {
+                delete musicasFavoritadas[musicaAtual.id]; 
+            } else {
+                musicasFavoritadas[musicaAtual.id] = true; 
+            }
+            atualizarFavoritoVisual(musicaAtual.id);
+            localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
+        }
     }
     
     // Botões do Player
