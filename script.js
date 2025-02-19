@@ -132,7 +132,7 @@
             autor: "Kurae Radiânthia Pendragon Isaac",
             capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true",
             background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true",
-            link: "https://github.com/PrinnyXII/st/raw/main/rep/Isaac/CryingAlone-Nowhere.mp3",
+            link: "assets/CryingAlone-Nowhere.mp3",
         }
     ];
     
