@@ -72,9 +72,19 @@
         document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
         document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
         document.getElementById("fecharEstadoCivil")?.addEventListener("click", fecharJanelaEstadoCivil);
-
+        document.getElementById("fecharPlayer")?.addEventListener("click", fecharPlayer);
+        document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
+        document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
+    
+        inicializarPlayerMusica();
+    
         atualizarBarra("barra-autoestima", "texto-autoestima", 99);
         atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
+    
+        atualizarListaMusicas();
+        selecionarMusica(1); // Carregar a primeira música ao abrir o site
+        document.getElementById("listaMusicas").style.display = "none";
+        atualizarBotaoPlay();
     });
             
     // Profissão
@@ -110,6 +120,25 @@
     }
     
     // --- Player de Música Isaac (Refatorado) ---
+    function inicializarPlayerMusica() {
+        console.log("Inicializando Player de Música...");
+    
+        window.audio = document.querySelector("#audio-player");
+        window.audioSource = document.querySelector("#audio-player source");
+        window.progressBar = document.getElementById("progress-bar");
+        window.tempoAtual = document.getElementById("tempo-atual");
+        window.tempoTotal = document.getElementById("tempo-total");
+    
+        if (!audio || !audioSource || !progressBar) {
+            console.error("Erro ao inicializar o player: elementos não encontrados.");
+            return;
+        }
+    
+        document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
+        document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
+        document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
+    }
+
     // Variáveis para elementos do player (selecionados uma vez, no escopo global)
     const playerMusica = document.querySelector('.player-musica-isaac'); // Elemento principal do player
     const audio = document.querySelector('audio');  // Elemento <audio>
