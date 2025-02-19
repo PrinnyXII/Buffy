@@ -72,6 +72,7 @@
         document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
         document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
         document.getElementById("fecharEstadoCivil")?.addEventListener("click", fecharJanelaEstadoCivil);
+        document.getElementById("fecharPlayer")?.addEventListener("click", fecharPlayer);
         document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
         document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
     
