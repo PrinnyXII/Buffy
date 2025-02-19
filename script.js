@@ -66,8 +66,8 @@
     }
 
     // Caracteristicas - Seção 06
-    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
-        console.log("Seção Características carregada!");
+    loadSection("secao-categorias", "Seções/6-Categorias.html", function () {
+        console.log("Seção Categorias carregada!");
     
         document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
         document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
@@ -75,14 +75,11 @@
         document.getElementById("fecharPlayer")?.addEventListener("click", fecharPlayer);
         document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
         document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
-    
-        document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
-        document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
-        document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
-    
+
         atualizarBarra("barra-autoestima", "texto-autoestima", 99);
         atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
-    
+        
+        inicializarPlayerMusica();
         atualizarListaMusicas();
         selecionarMusica(1); 
         document.getElementById("listaMusicas").style.display = "none";
@@ -122,6 +119,26 @@
     }
     
     // Player de Música Isaac
+    function inicializarPlayerMusica() {
+        console.log("Inicializando Player de Música...");
+    
+        // Capturar elementos corretamente após o carregamento
+        window.audio = document.querySelector("#audio-player");
+        window.audioSource = document.querySelector("#audio-player source");
+        window.progressBar = document.getElementById("progress-bar");
+        window.tempoAtual = document.getElementById("tempo-atual");
+        window.tempoTotal = document.getElementById("tempo-total");
+    
+        if (!audio || !audioSource || !progressBar) {
+            console.error("Erro ao inicializar o player: elementos não encontrados.");
+            return;
+        }
+    
+        document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
+        document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
+        document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
+    }
+
     function togglePlayerMusicaIsaac() {
         const player = document.getElementById('playerMusicaIsaac');
         const estadoCivil = document.getElementById('janelaEstadoCivil');
@@ -196,22 +213,29 @@
     function selecionarMusica(id) {
         const musicaSelecionada = listaDeMusicas.find((musica) => musica.id === id);
     
-        if (musicaSelecionada) {
-            document.querySelector('.nome-musica-isaac').textContent = musicaSelecionada.nome;
-            document.querySelector('.autor-musica-isaac').textContent = musicaSelecionada.autor;
-            document.querySelector('.capa-musica-isaac img').src = musicaSelecionada.capa;
-            document.querySelector('.player-musica-isaac').style.backgroundImage =
-                `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-            
-            audioSource.src = musicaSelecionada.link;
-            audio.load(); 
+        if (!musicaSelecionada) {
+            console.error("Música não encontrada!");
+            return;
+        }
     
-            audio.oncanplaythrough = () => { 
+        document.querySelector(".nome-musica-isaac").textContent = musicaSelecionada.nome;
+        document.querySelector(".autor-musica-isaac").textContent = musicaSelecionada.autor;
+        document.querySelector(".capa-musica-isaac img").src = musicaSelecionada.capa;
+        document.querySelector(".player-musica-isaac").style.backgroundImage =
+            `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
+    
+        if (audioSource) {
+            audioSource.src = musicaSelecionada.link;
+            audio.load();
+    
+            audio.oncanplaythrough = () => {
                 audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
                 musicaTocando = true;
                 atualizarBotaoPlay();
                 atualizarFavoritoVisual(id);
             };
+        } else {
+            console.error("Elemento 'audioSource' não encontrado.");
         }
     }
 
@@ -277,6 +301,11 @@
     }
     
     function playPause() {
+        if (!audio) {
+            console.error("Erro: Elemento 'audio' não encontrado!");
+            return;
+        }
+    
         if (musicaTocando) {
             audio.pause();
             musicaTocando = false;
