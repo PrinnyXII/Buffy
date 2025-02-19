@@ -241,7 +241,15 @@
         audio.currentTime = (progressBar.value / 100) * audio.duration;
     });
     
-    // Atualiza o tempo total quando os metadados da música são carregados
+    // Tempo
+    progressBar.addEventListener('input', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) { 
+            audio.currentTime = (progressBar.value / 100) * audio.duration;
+        } else {
+            console.warn("A duração do áudio ainda não está carregada.");
+        }
+    });
+
     function formatarTempo(segundos) {
         const minutos = Math.floor(segundos / 60);
         const restoSegundos = Math.floor(segundos % 60);
