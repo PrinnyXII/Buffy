@@ -10,7 +10,7 @@
         }
     }
 
-    // Carregar a seção da música e configurar o player
+    // Player Música - Seção 01
     loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
         const playerMusica = document.querySelector("#janelaMusica iframe");
         if (playerMusica) {
@@ -20,7 +20,12 @@
         }
     });
 
-    // Barra de Experiência
+    // Cabeçalho - Seção 03
+    loadSection("secao-cabecalho", "Seções/2-Cabecalho.html", function () {
+        console.log("Seção Cabeçalho carregada!");
+    });
+
+    // Barra de Experiência - Seção 04
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
         console.log("Seção Barra de Experiência carregada!");
     
@@ -41,7 +46,7 @@
         }, 500); 
     });
 
-    // Classes - Texto retraído
+    // Classes/Texto retraído - Seção 05
     loadSection("secao-classes", "Seções/5-Classes.html", function () {
         console.log("Seção Classes carregada!");
     });
@@ -55,7 +60,7 @@
         }
     }
 
-    // Caracteristicas
+    // Caracteristicas - Seção 06
     loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
         console.log("Seção Características carregada!");
     
