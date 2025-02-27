@@ -1,16 +1,17 @@
 
+
     // Buffy Música - Função para abrir e fechar a janela de música
     function toggleJanelaMusica() {
         const janela = document.getElementById('janelaMusica');
 
         if (janela.style.display === 'none' || janela.style.display === '') {
-            janela.style.display = 'block'; 
+            janela.style.display = 'block'; // Abre a janela
         } else {
-            janela.style.display = 'none'; 
+            janela.style.display = 'none'; // Fecha a janela
         }
     }
 
-    // Player Música - Seção 01
+    // Carregar a seção da música e configurar o player
     loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
         const playerMusica = document.querySelector("#janelaMusica iframe");
         if (playerMusica) {
@@ -20,17 +21,7 @@
         }
     });
 
-    // Taxa Assimilação - Seção 02
-    loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html", function () {
-        console.log("Seção Taxa de Assimilação carregada!");
-    });
-
-    // Cabeçalho - Seção 03
-    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
-        console.log("Seção Cabeçalho carregada!");
-    });
-
-    // Barra de Experiência - Seção 04
+    // Barra de Experiência
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
         console.log("Seção Barra de Experiência carregada!");
     
@@ -51,7 +42,12 @@
         }, 500); 
     });
 
-    // Classes/Texto retraído - Seção 05
+    // Cabeçalho - Seção 03
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
+        console.log("Seção Cabeçalho carregada!");
+    });
+
+    // Classes - Texto retraído
     loadSection("secao-classes", "Seções/5-Classes.html", function () {
         console.log("Seção Classes carregada!");
     });
@@ -65,33 +61,107 @@
         }
     }
 
-    // Caracteristicas - Seção 06
-    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html", function () {
-        console.log("Seção Características carregada!");
+    // Modo Empusa - Seção 06
+    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function () {
+        console.log("Seção Modo Empusa carregada!");
     
-        document.getElementById("botaoProfissao")?.addEventListener("click", toggleProfissao);
-        document.getElementById("botaoEstadoCivil")?.addEventListener("click", abrirJanelaEstadoCivil);
-        document.getElementById("fecharEstadoCivil")?.addEventListener("click", fecharJanelaEstadoCivil);
-        document.getElementById("fecharPlayer")?.addEventListener("click", fecharPlayer);
-        document.querySelector(".botao-favoritar-isaac")?.addEventListener("click", favoritarMusica);
-        document.querySelector(".botao-lista-musicas")?.addEventListener("click", toggleLista);
+        setTimeout(() => {
+            // Função para atualizar barras
+            function atualizarBarra(idBarra, idTexto, porcentagem) {
+                var progressBar = document.getElementById(idBarra);
+                var textSpan = document.getElementById(idTexto);
     
-        inicializarPlayerMusica();
+                if (progressBar && textSpan) {
+                    progressBar.style.width = porcentagem + '%';
+                    textSpan.textContent = porcentagem + '%';
+                } else {
+                    console.error(`Elemento '${idBarra}' ou '${idTexto}' não encontrado.`);
+                }
+            }
     
-        atualizarBarra("barra-autoestima", "texto-autoestima", 99);
-        atualizarBarra("barra-fama", "texto-fama", 94, "status-fama");
+            // Função para atualizar a barra de Fome 
+            function atualizarFome() {
+                var sangue = parseInt(document.getElementById("sangue-texto").textContent) || 0;
+                var vitalidade = parseInt(document.getElementById("vitalidade-texto").textContent) || 0;
+                var fomeTotal = Math.min(sangue + vitalidade, 100); 
     
-        atualizarListaMusicas();
-        selecionarMusica(1); 
-        document.getElementById("listaMusicas").style.display = "none";
-        atualizarBotaoPlay();
-    });
+                atualizarBarra("fomeBar", "fome-texto", fomeTotal);
+            }
+    
+            // Atualiza as barras individuais
+            atualizarBarra("prazerBar", "prazer-texto", 75);
+            atualizarBarra("amorBar", "amor-texto", 50);
+            atualizarBarra("sangueBar", "sangue-texto", 30);
+            atualizarBarra("vitalidadeBar", "vitalidade-texto", 50);
+    
+            // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
+            atualizarFome();
+    
+            // Função para abrir/fechar os menus ao clicar na seta azul
+            function toggleMenu(seta) {
+                var menu = seta.parentElement.nextElementSibling;
+    
+                // Fecha todos os menus antes de abrir o novo
+                document.querySelectorAll('.empusa-menu').forEach(m => {
+                    if (m !== menu) {
+                        m.style.display = 'none';
+                    }
+                });
+    
+                // Alterna a visibilidade do menu
+                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            }
+    
+            // Adiciona o evento de clique para todas as setas do menu
+            document.querySelectorAll('.empusa-seta').forEach(seta => {
+                seta.addEventListener('click', function () {
+                    toggleMenu(this);
+                });
+            });
+
+            function atualizarDor(nivelDor) {
+                nivelDor = Math.max(0, Math.min(nivelDor, 6));
             
-    // Profissão
+                for (let i = 1; i <= 6; i++) {
+                    let coracao = document.getElementById(`coracao-${i}`);
+                    
+                    if (i <= nivelDor) {
+                        coracao.textContent = "💜"; 
+                    } else {
+                        coracao.textContent = "🤍";
+                    }
+                }
+            }
+            
+            // Definir nível de dor
+            atualizarDor(0);
+
+            function atualizarSatisfacao(nivelSatisfacao) {
+                nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
+            
+                document.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
+                    emoji.classList.remove('emoji-selecionado');
+                });
+            
+                let emojiSelecionado = document.getElementById(`satisfacao-${nivelSatisfacao}`);
+                if (emojiSelecionado) {
+                    emojiSelecionado.classList.add('emoji-selecionado');
+                }
+            }
+            
+            // Definir nível de satisfação
+            atualizarSatisfacao(5);
+    
+        }, 500);
+    });
+
+    // Caracteristicas
     function toggleProfissao() {
         const detalhes = document.getElementById('detalhesProfissao');
-        if (detalhes) {
-            detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
+        if (detalhes.style.display === 'none' || detalhes.style.display === '') {
+            detalhes.style.display = 'block';
+        } else {
+            detalhes.style.display = 'none';
         }
     }
     
@@ -99,47 +169,21 @@
     function abrirJanelaEstadoCivil() {
         const janela = document.getElementById("janelaEstadoCivil");
         const textoCasada = document.querySelector(".texto-clicavel-isaac");
+        const rect = textoCasada.getBoundingClientRect();
+        const offsetX = window.pageXOffset || document.documentElement.scrollLeft;
+        const offsetY = window.pageYOffset || document.documentElement.scrollTop;
     
-        if (janela && textoCasada) {
-            const rect = textoCasada.getBoundingClientRect();
-            const offsetX = window.pageXOffset || document.documentElement.scrollLeft;
-            const offsetY = window.pageYOffset || document.documentElement.scrollTop;
-    
-            // Define a posição da janela flutuante
-            janela.style.left = `${rect.right + offsetX + 10}px`;
-            janela.style.top = `${rect.top + offsetY}px`;
-            janela.style.display = "block";
-        }
+        // Define a posição da janela flutuante
+        janela.style.left = `${rect.right + offsetX + 10}px`; // Ajuste para evitar sobreposição
+        janela.style.top = `${rect.top + offsetY}px`;
+        janela.style.display = "block"; // Torna a janela visível
     }
     
     function fecharJanelaEstadoCivil() {
         const janela = document.getElementById("janelaEstadoCivil");
-        if (janela) {
-            janela.style.display = "none";
-        }
+        janela.style.display = "none"; 
     }
-
-    // Iniciar Player Música
-    function inicializarPlayerMusica() {
-        console.log("Inicializando Player de Música...");
     
-        // Capturar elementos corretamente após o carregamento
-        window.audio = document.querySelector("#audio-player");
-        window.audioSource = document.querySelector("#audio-player source");
-        window.progressBar = document.getElementById("progress-bar");
-        window.tempoAtual = document.getElementById("tempo-atual");
-        window.tempoTotal = document.getElementById("tempo-total");
-    
-        if (!audio || !audioSource || !progressBar) {
-            console.error("Erro ao inicializar o player: elementos não encontrados.");
-            return;
-        }
-
-        document.querySelector(".botao-controle-isaac:nth-child(1)")?.addEventListener("click", retroceder10s);
-        document.querySelector(".botao-controle-isaac:nth-child(2)")?.addEventListener("click", playPause);
-        document.querySelector(".botao-controle-isaac:nth-child(3)")?.addEventListener("click", avancar10s);
-    }
-
     // Player de Música Isaac
     function togglePlayerMusicaIsaac() {
         const player = document.getElementById('playerMusicaIsaac');
@@ -157,18 +201,12 @@
     }
     
     function fecharPlayer() {
-        const player = document.getElementById("playerMusicaIsaac");
-        const estadoCivil = document.getElementById("janelaEstadoCivil");
+        const player = document.getElementById('playerMusicaIsaac');
+        const estadoCivil = document.getElementById('janelaEstadoCivil');
     
-        if (player) {
-            player.style.display = "none";
-        }
-        if (estadoCivil) {
-            estadoCivil.style.zIndex = "1000";
-        }
-        if (audio) {
-            audio.pause();
-        }
+        player.style.display = 'none';
+        estadoCivil.style.zIndex = '1000';
+        audio.pause();
         musicaTocando = false;
         atualizarBotaoPlay();
     }
@@ -215,46 +253,30 @@
     function selecionarMusica(id) {
         const musicaSelecionada = listaDeMusicas.find((musica) => musica.id === id);
     
-        if (!musicaSelecionada) {
-            console.error("Música não encontrada!");
-            return;
-        }
-    
-        document.querySelector(".nome-musica-isaac").textContent = musicaSelecionada.nome;
-        document.querySelector(".autor-musica-isaac").textContent = musicaSelecionada.autor;
-        document.querySelector(".capa-musica-isaac img").src = musicaSelecionada.capa;
-        document.querySelector(".player-musica-isaac").style.backgroundImage =
-            `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-    
-        if (audioSource) {
+        if (musicaSelecionada) {
+            document.querySelector('.nome-musica-isaac').textContent = musicaSelecionada.nome;
+            document.querySelector('.autor-musica-isaac').textContent = musicaSelecionada.autor;
+            document.querySelector('.capa-musica-isaac img').src = musicaSelecionada.capa;
+            document.querySelector('.player-musica-isaac').style.backgroundImage =
+                `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
+            
+            // **Correção: Atualizar a fonte do áudio corretamente**
             audioSource.src = musicaSelecionada.link;
-            audio.load();
+            audio.load(); // Recarregar o áudio após mudar o `src`
     
-            audio.oncanplaythrough = () => {
+            audio.oncanplaythrough = () => { 
                 audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
                 musicaTocando = true;
                 atualizarBotaoPlay();
                 atualizarFavoritoVisual(id);
             };
-        } else {
-            console.error("Elemento 'audioSource' não encontrado.");
         }
     }
 
     // Abrir/fechar a lista de músicas
     function toggleLista() {
-        const lista = document.getElementById("listaMusicas");
-        
-        if (!lista) {
-            console.error("Lista de músicas não encontrada!");
-            return;
-        }
-    
-        lista.style.display = lista.style.display === "block" ? "none" : "block";
-    
-        if (lista.style.display === "block") {
-            atualizarListaMusicas(); 
-        }
+        const lista = document.getElementById('listaMusicas');
+        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
     }
 
     // Favoritar Músicas
@@ -303,11 +325,6 @@
     }
     
     function playPause() {
-        if (!audio) {
-            console.error("Erro: Elemento 'audio' não encontrado!");
-            return;
-        }
-    
         if (musicaTocando) {
             audio.pause();
             musicaTocando = false;
@@ -366,53 +383,65 @@
             listaContainer.appendChild(item);
         });
     }
+    
+    // Carregar primeira música ao iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarListaMusicas();
+        selecionarMusica(1); // Carregar a primeira música
+        document.getElementById('listaMusicas').style.display = 'none';
+        atualizarBotaoPlay();
+    });
 
     // Fama/Moral - Barra de Progresso e Estado
     function atualizarBarra(idBarra, idTexto, porcentagem, idStatus = null) {
         const barra = document.getElementById(idBarra);
         const texto = document.getElementById(idTexto);
-    
-        if (barra && texto) {
-            // Atualiza a largura da barra e o texto central com a porcentagem
-            barra.style.width = `${porcentagem}%`;
-            texto.textContent = `${porcentagem}%`;
-    
-            // Define cor baseada na porcentagem
-            let cor;
-            if (porcentagem <= 20) {
-                cor = 'darkred';
-            } else if (porcentagem <= 40) {
-                cor = '#FF9100';
-            } else if (porcentagem <= 60) {
-                cor = '#00D19A';
-            } else if (porcentagem <= 80) {
-                cor = '#D622EF';
-            } else {
-                cor = '#6222EF';
-            }
-            barra.style.backgroundColor = cor;
+        
+        // Atualiza a largura da barra e o texto central com a porcentagem
+        barra.style.width = `${porcentagem}%`;
+        texto.textContent = `${porcentagem}%`;
+
+        // Define cor baseada na porcentagem
+        let cor;
+        if (porcentagem <= 20) {
+            cor = 'darkred';
+        } else if (porcentagem <= 40) {
+            cor = '#FF9100';
+        } else if (porcentagem <= 60) {
+            cor = '#00D19A';
+        } else if (porcentagem <= 80) {
+            cor = '#D622EF';
+        } else {
+            cor = '#6222EF';
         }
-    
-        // Atualizar status apenas se um ID de status for fornecido
+        barra.style.backgroundColor = cor;
+
+        // Atualiza o status apenas se o ID de status for fornecido
         if (idStatus) {
             const status = document.getElementById(idStatus);
-            if (status) {
-                let textoStatus;
-                if (porcentagem <= 20) {
-                    textoStatus = 'Infame - Condenado - Vilão - Corrupto';
-                } else if (porcentagem <= 40) {
-                    textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
-                } else if (porcentagem <= 60) {
-                    textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
-                } else if (porcentagem <= 80) {
-                    textoStatus = 'Respeitado - Admirado - Herói - Protetor';
-                } else {
-                    textoStatus = 'Renomado - Lendário - Venerado - Salvador';
-                }
-                status.textContent = textoStatus;
+            let textoStatus;
+
+            if (porcentagem <= 20) {
+                textoStatus = 'Infame - Condenado - Vilão - Corrupto';
+            } else if (porcentagem <= 40) {
+                textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
+            } else if (porcentagem <= 60) {
+                textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
+            } else if (porcentagem <= 80) {
+                textoStatus = 'Respeitado - Admirado - Herói - Protetor';
+            } else {
+                textoStatus = 'Renomado - Lendário - Venerado - Salvador';
             }
+
+            status.textContent = textoStatus;
         }
     }
+
+    // Autoestima - Atualiza apenas a cor e porcentagem
+    atualizarBarra('barra-autoestima', 'texto-autoestima', 99);
+
+    // Fama / Moral - Atualiza cor, porcentagem e status
+    atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
     
     // Títulos - Carrossel Automático
     let carrosselInterval;
@@ -939,7 +968,7 @@
     loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html");
     loadSection("secao-classes", "Seções/5-Classes.html");
-    loadSection("secao-caracteristicas", "Seções/6-Caracteristicas.html");
+    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html");
 
     // 
     function loadSection(id, url, callback) {
@@ -951,4 +980,3 @@
             })
             .catch(error => console.error('Erro ao carregar a seção:', error));
     }
-
