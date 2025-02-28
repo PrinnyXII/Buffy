@@ -583,11 +583,11 @@
             height: 100%;
             width: 100%; /* Sempre cheia */
             background: linear-gradient(to right, 
-                #8000FF 0%, 
-                #8000FF 45%, 
-                #6959CD 50%, 
-                #0080FF 55%, 
-                #0080FF 100%);
+                #A020F0 0%, 
+                #A020F0 45%, 
+                #11c892 50%, 
+                #caf94e 55%, 
+                #caf94e 100%);
             transition: all 0.5s ease-in-out;
         }
         
