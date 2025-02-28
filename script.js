@@ -225,11 +225,11 @@
                 if (preenchimento && emoji) {
                     // Atualiza o degradê dinâmico conforme a porcentagem
                     preenchimento.style.background = `linear-gradient(to right, 
-                        #a020f0 0%, 
-                        #a020f0 ${Math.max(0, porcentagem - 5)}%, 
-                        #11c892 ${porcentagem}%, 
-                        #caf94e ${Math.min(100, porcentagem + 5)}%, 
-                        #caf94e 100%)`;
+                        #ff12a9 0%, 
+                        #ff12a9 ${Math.max(0, porcentagem - 5)}%, 
+                        #a020f0 ${porcentagem}%, 
+                        #1e90ff ${Math.min(100, porcentagem + 5)}%, 
+                        #1e90ff 100%)`;
             
                     // Move o emoji para a posição correspondente
                     emoji.style.left = `calc(${porcentagem}% - 15px)`;
