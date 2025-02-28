@@ -376,12 +376,21 @@
         .empusa-linha1, .empusa-linha2, .empusa-linha3, .empusa-linha4, .empusa-linha5 {
             display: flex;
             justify-content: space-around;
-            gap: 15px;  
             align-items: center;    
+            gap: 15px;      
+        }
+
+        .empusa-linha6 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 25px;
         }
 
         /* Margem para cada linha */
-        .empusa-linha1 { margin-bottom: 5px; }
+        .empusa-linha1 { margin-bottom: 5px; margin-top: 0px; }
+        .empusa-linha1alvo { margin-bottom: 15px; margin-top: -35px; }
         .empusa-linha2, .empusa-linha3, .empusa-linha4, .empusa-linha5 { margin-bottom: 15px; }
 
         /* Ajustes individuais para cada bloco */
@@ -389,6 +398,7 @@
         .empusa-bloco2-linha1 { width: 280px; height: 80px; text-align: left; top: 50%; }
         .empusa-bloco3-linha1 { width: 280px; height: 80px; text-align: left; top: 50%; }
         .empusa-bloco4-linha1 { width: 210px; height: 130px; text-align: right; top: 50%; }
+        .empusa-bloco4-linha1Alvo { width: 210px; height: 130px; text-align: right; margin-top: 40px; }
         
         .empusa-bloco1-linha2 { width: 600px; height: 60px; text-align: center; }
         .empusa-bloco2-linha2 { width: 395px; height: 60px; text-align: center; }
@@ -414,7 +424,7 @@
             transition: transform 0.2s ease-in-out;
         }
 
-        .empusa-bloco4-linha1 {
+        .empusa-bloco4-linha1, .empusa-bloco4-linha1Alvo {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -503,11 +513,11 @@
         }
 
         /* Cores individuais para cada barra */
-        #prazerBar { background: linear-gradient(to right, #0100EC, #FB36F4); } 
-        #amorBar { background: linear-gradient(to right, #F237EF, #FC5252); }
+        #prazerBar, #prazerBarAlvo { background: linear-gradient(to right, #0100EC, #FB36F4); } 
+        #amorBar, #amorBarAlvo { background: linear-gradient(to right, #F237EF, #FC5252); }
         #fomeBar { background: linear-gradient(to right, #FF2626, #FFE526); }
-        #sangueBar { background-color: #FF2626; }
-        #vitalidadeBar { background-color: #FFE526; }
+        #sangueBar, #volumeBarAlvo { background-color: #FF2626; }
+        #vitalidadeBar, #vitalidadeBarAlvo { background-color: #FFE526; }
 
         .empusa-gotas, .empusa-satisfacao {
             font-size: 24px;
@@ -552,6 +562,42 @@
         
         .empusa-menu p:hover {
             color: #1E90FF;
+        }
+
+        .empusa-bloco1-linha6 {
+            width: 100%; 
+            max-width: 900px; 
+            text-align: center;
+        }
+        
+        .empusa-barra-dominancia {
+            width: 100%; 
+            height: 20px; 
+            border: 1px solid white;
+            position: relative;
+            overflow: visible;
+            margin-top: 5px;     
+        }
+        
+        .empusa-preenchimento-dominancia {
+            height: 100%;
+            width: 100%; /* Sempre cheia */
+            background: linear-gradient(to right, 
+                #8000FF 0%, 
+                #8000FF 45%, 
+                #6959CD 50%, 
+                #0080FF 55%, 
+                #0080FF 100%);
+            transition: all 0.5s ease-in-out;
+        }
+        
+        .empusa-emoji-dominancia {
+            position: absolute;
+            top: 35%;
+            transform: translateY(-50%);
+            font-size: 35px;
+            z-index: 5; 
+            pointer-events: none;    
         }
 
         /* Títulos */
