@@ -515,9 +515,9 @@
         /* Cores individuais para cada barra */
         #prazerBar, #prazerBarAlvo { background: linear-gradient(to right, #0100EC, #FB36F4); } 
         #amorBar, #amorBarAlvo { background: linear-gradient(to right, #F237EF, #FC5252); }
-        #fomeBar { background: linear-gradient(to right, #FF2626, #FFE526); }
-        #sangueBar, #volumeBarAlvo { background-color: #FF2626; }
-        #vitalidadeBar, #vitalidadeBarAlvo { background-color: #FFE526; }
+        #fomeBar { background: linear-gradient(to right, #ff3347, #bbff3d); }
+        #sangueBar, #volumeBarAlvo { background-color: #ff3347; }
+        #vitalidadeBar, #vitalidadeBarAlvo { background-color: #bbff3d; }
 
         .empusa-gotas, .empusa-satisfacao {
             font-size: 24px;
