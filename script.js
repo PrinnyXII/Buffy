@@ -1,5 +1,4 @@
 
-
     // Buffy Música - Função para abrir e fechar a janela de música
     function toggleJanelaMusica() {
         const janela = document.getElementById('janelaMusica');
@@ -28,7 +27,7 @@
         setTimeout(() => {
             var progressBar = document.getElementById('expBar');
             if (progressBar) {
-                var percentage = 73; // 
+                var percentage = 73; // Atualiza bara EXP
                 progressBar.style.width = percentage + '%';
     
                 // Atualizar o texto da barra
@@ -66,6 +65,20 @@
         console.log("Seção Modo Empusa carregada!");
     
         setTimeout(() => {
+            
+            // Atualiza as barras individuais
+            atualizarBarra("prazerBar", "prazer-texto", 75);
+            atualizarBarra("amorBar", "amor-texto", 50);
+            atualizarBarra("sangueBar", "sangue-texto", 30);
+            atualizarBarra("vitalidadeBar", "vitalidade-texto", 50);
+    
+            // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
+            atualizarFome();
+
+            // Definir nível de dor e satifação
+            atualizarDor(0);  
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
+            
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -87,15 +100,6 @@
     
                 atualizarBarra("fomeBar", "fome-texto", fomeTotal);
             }
-    
-            // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 75);
-            atualizarBarra("amorBar", "amor-texto", 50);
-            atualizarBarra("sangueBar", "sangue-texto", 30);
-            atualizarBarra("vitalidadeBar", "vitalidade-texto", 50);
-    
-            // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
-            atualizarFome();
     
             // Função para abrir/fechar os menus ao clicar na seta azul
             function toggleMenu(seta) {
@@ -132,26 +136,106 @@
                     }
                 }
             }
-            
-            // Definir nível de dor
-            atualizarDor(0);
 
-            function atualizarSatisfacao(nivelSatisfacao) {
+            function atualizarSatisfacao(idContainer, idPrefixo, nivelSatisfacao) {
+                // Garante que o nível de satisfação esteja entre 1 e 6
                 nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
             
-                document.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
+                // Seleciona apenas os emojis dentro do container correto (Buffy ou Alvo)
+                let container = document.getElementById(idContainer);
+                if (!container) return;
+            
+                // Remove o efeito apenas dos emojis dentro da seção correta
+                container.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
                     emoji.classList.remove('emoji-selecionado');
                 });
             
-                let emojiSelecionado = document.getElementById(`satisfacao-${nivelSatisfacao}`);
+                // Adiciona o efeito ao emoji correto
+                let emojiSelecionado = document.getElementById(`${idPrefixo}-${nivelSatisfacao}`);
                 if (emojiSelecionado) {
                     emojiSelecionado.classList.add('emoji-selecionado');
                 }
             }
-            
-            // Definir nível de satisfação
-            atualizarSatisfacao(5);
+
+        }, 500);
+    });
+
+    // Modo Empusa Alvo - Seção 07
+    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function () {
+        console.log("Seção Modo Empusa - Alvo carregada!");
     
+        setTimeout(() => {
+            
+            // Atualiza as barras individuais
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 60);
+            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 40);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 70);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 90);
+
+            // Definir nível de dor e satifação    
+            atualizarDorAlvo(2);            
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 3);  
+
+            // Definir nível de dominancia
+            atualizarDominancia(30);            
+            
+            function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
+                var progressBar = document.getElementById(idBarra);
+                var textSpan = document.getElementById(idTexto);
+    
+                if (progressBar && textSpan) {
+                    progressBar.style.width = porcentagem + '%';
+                    textSpan.textContent = porcentagem + '%';
+                }
+            }
+    
+            function atualizarDorAlvo(nivelDor) {
+                for (let i = 1; i <= 6; i++) {
+                    let coracao = document.getElementById(`coracao-alvo-${i}`);
+                    coracao.textContent = i <= nivelDor ? "💜" : "🤍";
+                }
+            }
+
+            function atualizarSatisfacao(idContainer, idPrefixo, nivelSatisfacao) {
+                // Garante que o nível de satisfação esteja entre 1 e 6
+                nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
+            
+                // Seleciona apenas os emojis dentro do container correto (Buffy ou Alvo)
+                let container = document.getElementById(idContainer);
+                if (!container) return;
+            
+                // Remove o efeito apenas dos emojis dentro da seção correta
+                container.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
+                    emoji.classList.remove('emoji-selecionado');
+                });
+            
+                // Adiciona o efeito ao emoji correto
+                let emojiSelecionado = document.getElementById(`${idPrefixo}-${nivelSatisfacao}`);
+                if (emojiSelecionado) {
+                    emojiSelecionado.classList.add('emoji-selecionado');
+                }
+            }
+
+            function atualizarDominancia(porcentagem) {
+                porcentagem = Math.max(0, Math.min(porcentagem, 100)); // Garante que o valor esteja entre 0 e 100
+            
+                let preenchimento = document.getElementById("dominanciaBar");
+                let emoji = document.getElementById("dominancia-emoji");
+            
+                if (preenchimento && emoji) {
+                    // Atualiza o degradê dinâmico conforme a porcentagem
+                    preenchimento.style.background = `linear-gradient(to right, 
+                        #8000FF 0%, 
+                        #8000FF ${Math.max(0, porcentagem - 5)}%, 
+                        #6959CD ${porcentagem}%, 
+                        #0080FF ${Math.min(100, porcentagem + 5)}%, 
+                        #0080FF 100%)`;
+            
+                    // Move o emoji para a posição correspondente
+                    emoji.style.left = `calc(${porcentagem}% - 15px)`;
+                }
+            }
+            
         }, 500);
     });
 
@@ -174,9 +258,9 @@
         const offsetY = window.pageYOffset || document.documentElement.scrollTop;
     
         // Define a posição da janela flutuante
-        janela.style.left = `${rect.right + offsetX + 10}px`; // Ajuste para evitar sobreposição
+        janela.style.left = `${rect.right + offsetX + 10}px`; 
         janela.style.top = `${rect.top + offsetY}px`;
-        janela.style.display = "block"; // Torna a janela visível
+        janela.style.display = "block"; 
     }
     
     function fecharJanelaEstadoCivil() {
@@ -969,6 +1053,7 @@
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html");
     loadSection("secao-classes", "Seções/5-Classes.html");
     loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html");
+    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html");
 
     // 
     function loadSection(id, url, callback) {
