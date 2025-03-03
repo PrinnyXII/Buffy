@@ -522,10 +522,10 @@
     }
 
     // Autoestima - Atualiza apenas a cor e porcentagem
-    atualizarBarra('barra-autoestima', 'texto-autoestima', 99);
+    atualizarBarra('barra-autoestima', 'texto-autoestima', 98);
 
     // Fama / Moral - Atualiza cor, porcentagem e status
-    atualizarBarra('barra-fama', 'texto-fama', 94, 'status-fama');
+    atualizarBarra('barra-fama', 'texto-fama', 97, 'status-fama');
     
     // Títulos - Carrossel Automático
     let carrosselInterval;
