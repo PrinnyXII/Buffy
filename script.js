@@ -632,7 +632,7 @@
         spd: { total: 1020989, porcentagem: 100 },
         int: { total: 431815, porcentagem: 100 },
         atk: { total: 2075839, porcentagem: 100 },
-        smp: { total: 291363290, porcentagem: 73.72381 },
+        smp: { total: 291363290, porcentagem: 66.20 },
         unknown: { total: 100, porcentagem: 50 }
     };
 
