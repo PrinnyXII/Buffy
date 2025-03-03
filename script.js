@@ -899,9 +899,9 @@
         textoEA.textContent = `EA: ${porcentagem}%`;
     }
     
-    // Exemplo: Definir a porcentagem inicial 
+    // Definir a porcentagem inicial 
     document.addEventListener('DOMContentLoaded', () => {
-        atualizarEA(53);
+        atualizarEA(86);
     });
 
 
@@ -1005,11 +1005,11 @@
     atualizarStatusBasicas('grupo-sono', 100);
     atualizarStatusBasicas('grupo-fome', 99);
     atualizarStatusBasicas('grupo-sede', 99);
-    atualizarStatusBasicas('grupo-diversao', 99);
+    atualizarStatusBasicas('grupo-diversao', 100);
     atualizarStatusBasicas('grupo-social', 99);
-    atualizarStatusBasicas('grupo-foco', 99);
+    atualizarStatusBasicas('grupo-foco', 101);
     atualizarStatusBasicas('grupo-felicidade', 99);
-    atualizarStatusBasicas('grupo-tesao', 99);
+    atualizarStatusBasicas('grupo-tesao', 101);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
@@ -1018,7 +1018,7 @@
     atualizarStatusTemporarias('grupo-ansiedade', 0);
     atualizarStatusTemporarias('grupo-medo', 0);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 0);
+    atualizarStatusTemporarias('grupo-raiva', 21);
     atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
