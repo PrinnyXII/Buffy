@@ -27,13 +27,13 @@
         setTimeout(() => {
             var progressBar = document.getElementById('expBar');
             if (progressBar) {
-                var percentage = 73; // Atualiza bara EXP
+                var percentage = 75; // Atualiza bara EXP
                 progressBar.style.width = percentage + '%';
     
                 // Atualizar o texto da barra
                 var textSpan = document.querySelector('.barra-texto');
                 if (textSpan) {
-                    textSpan.textContent = '1303 - ' + percentage + '%';
+                    textSpan.textContent = '1590 - ' + percentage + '%';
                 }
             } else {
                 console.error("Elemento 'expBar' não encontrado.");
