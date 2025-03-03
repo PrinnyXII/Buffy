@@ -67,9 +67,9 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 75);
-            atualizarBarra("amorBar", "amor-texto", 50);
-            atualizarBarra("sangueBar", "sangue-texto", 30);
+            atualizarBarra("prazerBar", "prazer-texto", 100);
+            atualizarBarra("amorBar", "amor-texto", 100);
+            atualizarBarra("sangueBar", "sangue-texto", 50);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 50);
     
             // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
@@ -77,7 +77,7 @@
 
             // Definir nível de dor e satifação
             atualizarDor(0);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 6);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -167,17 +167,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 60);
-            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 40);
-            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 70);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 90);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 94);
+            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 100);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 100);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(2);            
-            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 3);  
+            atualizarDorAlvo(1);            
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 5);  
 
             // Definir nível de dominancia
-            atualizarDominancia(30);            
+            atualizarDominancia(63);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
