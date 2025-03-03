@@ -954,9 +954,12 @@
         } else if (porcentagem <= 95) {
             color = 'green';
             status = 'Bom';
-        } else {
+        } else if (porcentagem <= 100) {
             color = '#00B59B';
             status = 'Excelente';
+        } else {
+            color = '#6222EF';
+            status = 'Insano';
         }
 
         fillBar.style.backgroundColor = color;
