@@ -624,16 +624,16 @@
 
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
-        hp: { total: 4024763, porcentagem: 100 },
-        mp: { total: 675157, porcentagem: 100 },
-        agi: { total: 522434, porcentagem: 100 },
-        def: { total: 1210293, porcentagem: 100 },
-        res: { total: 303776, porcentagem: 100 },
-        spd: { total: 836877, porcentagem: 100 },
-        int: { total: 353947, porcentagem: 100 },
-        atk: { total: 1701508, porcentagem: 100 },
-        smp: { total: 9314172, porcentagem: 73.72381 },
-        unknown: { total: 100, porcentagem: 47.19 }
+        hp: { total: 4910210, porcentagem: 100 },
+        mp: { total: 823691, porcentagem: 100 },
+        agi: { total: 637369, porcentagem: 100 },
+        def: { total: 1476557, porcentagem: 100 },
+        res: { total: 1331048, porcentagem: 100 },
+        spd: { total: 1020989, porcentagem: 100 },
+        int: { total: 431815, porcentagem: 100 },
+        atk: { total: 2075839, porcentagem: 100 },
+        smp: { total: 291363290, porcentagem: 73.72381 },
+        unknown: { total: 100, porcentagem: 50 }
     };
 
     // Atributos - Atualizando os valores e porcentagens das barras
