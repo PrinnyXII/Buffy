@@ -1008,10 +1008,10 @@
     atualizarStatusBasicas('grupo-sono', 100);
     atualizarStatusBasicas('grupo-fome', 99);
     atualizarStatusBasicas('grupo-sede', 99);
-    atualizarStatusBasicas('grupo-diversao', 100);
+    atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 99);
-    atualizarStatusBasicas('grupo-foco', 101);
-    atualizarStatusBasicas('grupo-felicidade', 99);
+    atualizarStatusBasicas('grupo-foco', 81);
+    atualizarStatusBasicas('grupo-felicidade', 100);
     atualizarStatusBasicas('grupo-tesao', 101);
 
     // Exemplo de uso para Necessidades Temporárias
@@ -1021,7 +1021,7 @@
     atualizarStatusTemporarias('grupo-ansiedade', 0);
     atualizarStatusTemporarias('grupo-medo', 0);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 21);
+    atualizarStatusTemporarias('grupo-raiva', 3);
     atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
