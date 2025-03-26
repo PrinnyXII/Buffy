@@ -1006,11 +1006,11 @@
     atualizarStatusBasicas('grupo-higiene', 100);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 99);
-    atualizarStatusBasicas('grupo-sede', 99);
+    atualizarStatusBasicas('grupo-fome', 73);
+    atualizarStatusBasicas('grupo-sede', 81);
     atualizarStatusBasicas('grupo-diversao', 101);
-    atualizarStatusBasicas('grupo-social', 99);
-    atualizarStatusBasicas('grupo-foco', 81);
+    atualizarStatusBasicas('grupo-social', 100);
+    atualizarStatusBasicas('grupo-foco', 76);
     atualizarStatusBasicas('grupo-felicidade', 100);
     atualizarStatusBasicas('grupo-tesao', 101);
 
@@ -1018,10 +1018,10 @@
     atualizarStatusTemporarias('grupo-enjoo', 0);
     atualizarStatusTemporarias('grupo-fadiga', 0);
     atualizarStatusTemporarias('grupo-estresse', 0);
-    atualizarStatusTemporarias('grupo-ansiedade', 0);
+    atualizarStatusTemporarias('grupo-ansiedade', 9);
     atualizarStatusTemporarias('grupo-medo', 0);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 3);
+    atualizarStatusTemporarias('grupo-raiva', 1);
     atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
