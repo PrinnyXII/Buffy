@@ -67,17 +67,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 100);
+            atualizarBarra("prazerBar", "prazer-texto", 7);
             atualizarBarra("amorBar", "amor-texto", 100);
-            atualizarBarra("sangueBar", "sangue-texto", 50);
-            atualizarBarra("vitalidadeBar", "vitalidade-texto", 50);
+            atualizarBarra("sangueBar", "sangue-texto", 14);
+            atualizarBarra("vitalidadeBar", "vitalidade-texto", 97);
     
             // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
             atualizarFome();
 
             // Definir nível de dor e satifação
             atualizarDor(0);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 6);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 2);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
