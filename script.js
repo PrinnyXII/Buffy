@@ -167,17 +167,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 94);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 20);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
             atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 100);
             atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 100);
 
             // Definir nível de dor e satifação    
             atualizarDorAlvo(1);            
-            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 5);  
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 1);  
 
             // Definir nível de dominancia
-            atualizarDominancia(63);            
+            atualizarDominancia(5);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -1006,8 +1006,8 @@
     atualizarStatusBasicas('grupo-higiene', 100);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 73);
-    atualizarStatusBasicas('grupo-sede', 81);
+    atualizarStatusBasicas('grupo-fome', 62);
+    atualizarStatusBasicas('grupo-sede', 74);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 100);
     atualizarStatusBasicas('grupo-foco', 76);
@@ -1017,11 +1017,11 @@
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
     atualizarStatusTemporarias('grupo-fadiga', 0);
-    atualizarStatusTemporarias('grupo-estresse', 0);
-    atualizarStatusTemporarias('grupo-ansiedade', 9);
-    atualizarStatusTemporarias('grupo-medo', 0);
+    atualizarStatusTemporarias('grupo-estresse', 14);
+    atualizarStatusTemporarias('grupo-ansiedade', 38);
+    atualizarStatusTemporarias('grupo-medo', 7);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 1);
+    atualizarStatusTemporarias('grupo-raiva', 11);
     atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
