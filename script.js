@@ -67,9 +67,9 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 7);
-            atualizarBarra("amorBar", "amor-texto", 100);
-            atualizarBarra("sangueBar", "sangue-texto", 14);
+            atualizarBarra("prazerBar", "prazer-texto", 83);
+            atualizarBarra("amorBar", "amor-texto", 51);
+            atualizarBarra("sangueBar", "sangue-texto", 8);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 97);
     
             // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
@@ -77,7 +77,7 @@
 
             // Definir nível de dor e satifação
             atualizarDor(0);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 2);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -167,14 +167,14 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 20);
-            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 58);
+            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 32);
             atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 100);
             atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 100);
 
             // Definir nível de dor e satifação    
             atualizarDorAlvo(1);            
-            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 1);  
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 4);  
 
             // Definir nível de dominancia
             atualizarDominancia(5);            
@@ -1003,25 +1003,25 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 100);
+    atualizarStatusBasicas('grupo-higiene', 92);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 62);
-    atualizarStatusBasicas('grupo-sede', 74);
+    atualizarStatusBasicas('grupo-fome', 53);
+    atualizarStatusBasicas('grupo-sede', 61);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 100);
-    atualizarStatusBasicas('grupo-foco', 76);
+    atualizarStatusBasicas('grupo-foco', 62);
     atualizarStatusBasicas('grupo-felicidade', 100);
     atualizarStatusBasicas('grupo-tesao', 101);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
     atualizarStatusTemporarias('grupo-fadiga', 0);
-    atualizarStatusTemporarias('grupo-estresse', 14);
-    atualizarStatusTemporarias('grupo-ansiedade', 38);
-    atualizarStatusTemporarias('grupo-medo', 7);
+    atualizarStatusTemporarias('grupo-estresse', 6);
+    atualizarStatusTemporarias('grupo-ansiedade', 49);
+    atualizarStatusTemporarias('grupo-medo', 17);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 11);
+    atualizarStatusTemporarias('grupo-raiva', 9);
     atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
