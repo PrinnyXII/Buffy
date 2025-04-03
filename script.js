@@ -76,7 +76,7 @@
             atualizarFome();
 
             // Definir nível de dor e satifação
-            atualizarDor(0);  
+            atualizarDor(2);  
             atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
             
             // Função para atualizar barras
@@ -173,11 +173,11 @@
             atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 100);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(1);            
+            atualizarDorAlvo(0);            
             atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 4);  
 
             // Definir nível de dominancia
-            atualizarDominancia(5);            
+            atualizarDominancia(0);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
