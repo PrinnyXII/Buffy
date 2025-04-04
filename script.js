@@ -624,8 +624,8 @@
 
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
-        hp: { total: 4910210, porcentagem: 92 },
-        mp: { total: 823691, porcentagem: 100 },
+        hp: { total: 4910210, porcentagem: 41 },
+        mp: { total: 823691, porcentagem: 68 },
         agi: { total: 637369, porcentagem: 100 },
         def: { total: 1476557, porcentagem: 100 },
         res: { total: 1331048, porcentagem: 100 },
@@ -1003,26 +1003,26 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 92);
+    atualizarStatusBasicas('grupo-higiene', 74);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 53);
-    atualizarStatusBasicas('grupo-sede', 61);
+    atualizarStatusBasicas('grupo-fome', 41);
+    atualizarStatusBasicas('grupo-sede', 53);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 100);
-    atualizarStatusBasicas('grupo-foco', 62);
+    atualizarStatusBasicas('grupo-foco', 47);
     atualizarStatusBasicas('grupo-felicidade', 100);
     atualizarStatusBasicas('grupo-tesao', 101);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
     atualizarStatusTemporarias('grupo-fadiga', 0);
-    atualizarStatusTemporarias('grupo-estresse', 6);
-    atualizarStatusTemporarias('grupo-ansiedade', 49);
-    atualizarStatusTemporarias('grupo-medo', 17);
+    atualizarStatusTemporarias('grupo-estresse', 2);
+    atualizarStatusTemporarias('grupo-ansiedade', 67);
+    atualizarStatusTemporarias('grupo-medo', 33);
     atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 9);
-    atualizarStatusTemporarias('grupo-desgaste', 0);
+    atualizarStatusTemporarias('grupo-raiva', 2);
+    atualizarStatusTemporarias('grupo-desgaste', 19);
 
     // Define a porcentagem inicial do Aether
     let porcentagemAether = 101; 
