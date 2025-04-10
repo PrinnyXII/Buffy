@@ -67,17 +67,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 100);
+            atualizarBarra("prazerBar", "prazer-texto", 22);
             atualizarBarra("amorBar", "amor-texto", 100);
-            atualizarBarra("sangueBar", "sangue-texto", 9);
-            atualizarBarra("vitalidadeBar", "vitalidade-texto", 11);
+            atualizarBarra("sangueBar", "sangue-texto", 2);
+            atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
     
             // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
             atualizarFome();
 
             // Definir nível de dor e satifação
-            atualizarDor(6);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 6);
+            atualizarDor(0);  
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 0);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -167,17 +167,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 100);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 67);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
-            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo",18);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 7);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 51);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 87);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(6);            
-            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 6);  
+            atualizarDorAlvo(2);            
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 2);  
 
             // Definir nível de dominancia
-            atualizarDominancia(49);            
+            atualizarDominancia(41);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -624,15 +624,15 @@
 
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
-        hp: { total: 4910210, porcentagem: 2 },
-        mp: { total: 823691, porcentagem: 1 },
+        hp: { total: 4910210, porcentagem: 100 },
+        mp: { total: 823691, porcentagem: 72 },
         agi: { total: 637369, porcentagem: 100 },
         def: { total: 1476557, porcentagem: 100 },
         res: { total: 1331048, porcentagem: 100 },
         spd: { total: 1020989, porcentagem: 100 },
         int: { total: 431815, porcentagem: 100 },
         atk: { total: 2075839, porcentagem: 100 },
-        smp: { total: 291363290, porcentagem: 66.20 },
+        smp: { total: 291363290, porcentagem: 99.17 },
         unknown: { total: 100, porcentagem: 50 }
     };
 
@@ -1003,26 +1003,26 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 41);
+    atualizarStatusBasicas('grupo-higiene', 31);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 100);
-    atualizarStatusBasicas('grupo-sede', 100);
+    atualizarStatusBasicas('grupo-fome', 21);
+    atualizarStatusBasicas('grupo-sede', 17);
     atualizarStatusBasicas('grupo-diversao', 101);
-    atualizarStatusBasicas('grupo-social', 100);
-    atualizarStatusBasicas('grupo-foco', 13);
+    atualizarStatusBasicas('grupo-social', 61);
+    atualizarStatusBasicas('grupo-foco', 53);
     atualizarStatusBasicas('grupo-felicidade', 100);
-    atualizarStatusBasicas('grupo-tesao', 101);
+    atualizarStatusBasicas('grupo-tesao', 95);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
     atualizarStatusTemporarias('grupo-fadiga', 0);
     atualizarStatusTemporarias('grupo-estresse', 0);
     atualizarStatusTemporarias('grupo-ansiedade', 0);
-    atualizarStatusTemporarias('grupo-medo', 9);
+    atualizarStatusTemporarias('grupo-medo', 0);
     atualizarStatusTemporarias('grupo-tedio', 0);
     atualizarStatusTemporarias('grupo-raiva', 0);
-    atualizarStatusTemporarias('grupo-desgaste', 94);
+    atualizarStatusTemporarias('grupo-desgaste', 0);
 
     // Define a porcentagem inicial do Aether
     let porcentagemAether = 101; 
