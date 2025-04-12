@@ -67,7 +67,7 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 22);
+            atualizarBarra("prazerBar", "prazer-texto", 51);
             atualizarBarra("amorBar", "amor-texto", 100);
             atualizarBarra("sangueBar", "sangue-texto", 2);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
@@ -167,17 +167,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 67);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 61);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
-            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 51);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 87);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 42);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 80);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(2);            
-            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 2);  
+            atualizarDorAlvo(1);            
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 4);  
 
             // Definir nível de dominancia
-            atualizarDominancia(41);            
+            atualizarDominancia(34);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -625,7 +625,7 @@
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
         hp: { total: 4910210, porcentagem: 100 },
-        mp: { total: 823691, porcentagem: 72 },
+        mp: { total: 823691, porcentagem: 74 },
         agi: { total: 637369, porcentagem: 100 },
         def: { total: 1476557, porcentagem: 100 },
         res: { total: 1331048, porcentagem: 100 },
@@ -1003,16 +1003,16 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 31);
+    atualizarStatusBasicas('grupo-higiene', 62);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
     atualizarStatusBasicas('grupo-fome', 21);
     atualizarStatusBasicas('grupo-sede', 17);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 61);
-    atualizarStatusBasicas('grupo-foco', 53);
-    atualizarStatusBasicas('grupo-felicidade', 100);
-    atualizarStatusBasicas('grupo-tesao', 95);
+    atualizarStatusBasicas('grupo-foco', 64);
+    atualizarStatusBasicas('grupo-felicidade', 101);
+    atualizarStatusBasicas('grupo-tesao', 97);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
