@@ -67,7 +67,7 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 51);
+            atualizarBarra("prazerBar", "prazer-texto", 63);
             atualizarBarra("amorBar", "amor-texto", 100);
             atualizarBarra("sangueBar", "sangue-texto", 2);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
@@ -77,7 +77,7 @@
 
             // Definir nível de dor e satifação
             atualizarDor(0);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 0);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 1);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -167,17 +167,17 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 61);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 74);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
-            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 42);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 80);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 38);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 61);
 
             // Definir nível de dor e satifação    
             atualizarDorAlvo(1);            
             atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 4);  
 
             // Definir nível de dominancia
-            atualizarDominancia(34);            
+            atualizarDominancia(64);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -1003,16 +1003,16 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 62);
+    atualizarStatusBasicas('grupo-higiene', 86);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 21);
-    atualizarStatusBasicas('grupo-sede', 17);
+    atualizarStatusBasicas('grupo-fome', 16);
+    atualizarStatusBasicas('grupo-sede', 65);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 61);
     atualizarStatusBasicas('grupo-foco', 64);
     atualizarStatusBasicas('grupo-felicidade', 101);
-    atualizarStatusBasicas('grupo-tesao', 97);
+    atualizarStatusBasicas('grupo-tesao', 99);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
