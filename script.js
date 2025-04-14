@@ -67,9 +67,9 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 63);
+            atualizarBarra("prazerBar", "prazer-texto", 87);
             atualizarBarra("amorBar", "amor-texto", 100);
-            atualizarBarra("sangueBar", "sangue-texto", 2);
+            atualizarBarra("sangueBar", "sangue-texto", 29);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
     
             // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
@@ -77,7 +77,7 @@
 
             // Definir nível de dor e satifação
             atualizarDor(0);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 1);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 3);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -169,15 +169,15 @@
             // Atualiza as barras individuais
             atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 74);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
-            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 38);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 61);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 11);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 53);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(1);            
+            atualizarDorAlvo(2);            
             atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 4);  
 
             // Definir nível de dominancia
-            atualizarDominancia(64);            
+            atualizarDominancia(61);            
             
             function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
                 var progressBar = document.getElementById(idBarra);
@@ -625,7 +625,7 @@
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
         hp: { total: 4910210, porcentagem: 100 },
-        mp: { total: 823691, porcentagem: 74 },
+        mp: { total: 823691, porcentagem: 96 },
         agi: { total: 637369, porcentagem: 100 },
         def: { total: 1476557, porcentagem: 100 },
         res: { total: 1331048, porcentagem: 100 },
@@ -1003,16 +1003,16 @@
     }
 
     // Exemplo de uso para Necessidades Básicas
-    atualizarStatusBasicas('grupo-higiene', 86);
+    atualizarStatusBasicas('grupo-higiene', 98);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 16);
-    atualizarStatusBasicas('grupo-sede', 65);
+    atualizarStatusBasicas('grupo-fome', 56);
+    atualizarStatusBasicas('grupo-sede', 100);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 61);
-    atualizarStatusBasicas('grupo-foco', 64);
+    atualizarStatusBasicas('grupo-foco', 41);
     atualizarStatusBasicas('grupo-felicidade', 101);
-    atualizarStatusBasicas('grupo-tesao', 99);
+    atualizarStatusBasicas('grupo-tesao', 100);
 
     // Exemplo de uso para Necessidades Temporárias
     atualizarStatusTemporarias('grupo-enjoo', 0);
