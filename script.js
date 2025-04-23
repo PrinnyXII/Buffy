@@ -67,7 +67,7 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarra("prazerBar", "prazer-texto", 98);
+            atualizarBarra("prazerBar", "prazer-texto", 99);
             atualizarBarra("amorBar", "amor-texto", 100);
             atualizarBarra("sangueBar", "sangue-texto", 47);
             atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
@@ -77,7 +77,7 @@
 
             // Definir nível de dor e satifação
             atualizarDor(1);  
-            atualizarSatisfacao("satisfacao-container", "satisfacao", 4);
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
             
             // Função para atualizar barras
             function atualizarBarra(idBarra, idTexto, porcentagem) {
@@ -167,13 +167,13 @@
         setTimeout(() => {
             
             // Atualiza as barras individuais
-            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 94);
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 98);
             atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
             atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 5);
-            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 32);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 21);
 
             // Definir nível de dor e satifação    
-            atualizarDorAlvo(2);            
+            atualizarDorAlvo(3);            
             atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 5);  
 
             // Definir nível de dominancia
@@ -1006,11 +1006,11 @@
     atualizarStatusBasicas('grupo-higiene', 97);
     atualizarStatusBasicas('grupo-banheiro', 100);
     atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 87);
+    atualizarStatusBasicas('grupo-fome', 100);
     atualizarStatusBasicas('grupo-sede', 100);
     atualizarStatusBasicas('grupo-diversao', 101);
     atualizarStatusBasicas('grupo-social', 78);
-    atualizarStatusBasicas('grupo-foco', 41);
+    atualizarStatusBasicas('grupo-foco', 64);
     atualizarStatusBasicas('grupo-felicidade', 101);
     atualizarStatusBasicas('grupo-tesao', 101);
 
