@@ -1,5 +1,5 @@
 // =========================================================================
-// script.js - VERSÃO COMPLETA FINAL - Baseado no Original com Caminhos Relativos
+// script.js - FINAL - Baseado no Original com Caminhos Relativos Corretos
 // =========================================================================
 
 // =========================================================================
@@ -26,17 +26,17 @@ function loadSection(id, url, callback) {
 }
 
 // =========================================================================
-// VARIÁVEIS GLOBAIS (Baseadas no script original)
+// VARIÁVEIS GLOBAIS (Nomes e escopo do script original)
 // =========================================================================
 let playerMusica, audio, audioSource, progressBar, tempoAtual, tempoTotal;
 let musicaTocando = false;
-let carrosselInterval; // Para carrossel de títulos
+let carrosselInterval;
 let chaveAtual = 0;
-let posicaoCarrossel = 0; // Para carrossel de bênçãos
+let posicaoCarrossel = 0;
 let porcentagemAether = 101;
 
 // =========================================================================
-// DADOS GLOBAIS (Baseados no script original com caminhos relativos)
+// DADOS GLOBAIS (Com caminhos relativos onde aplicável)
 // =========================================================================
 
 // --- PLAYER DE MÚSICA ISAAC ---
@@ -48,7 +48,7 @@ const listaDeMusicas = [
         autor: "Kurae Radiânthia Pendragon Isaac",
         capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true", // Mantido
         background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true", // Mantido
-        link: "assets/CryingAlone-Nowhere.mp3", // Confirmar localização
+        link: "assets/CryingAlone-Nowhere.mp3", // Confirmar localização em /assets/
     }
 ];
 const storageKey = 'musicasFavoritadas';
@@ -103,12 +103,13 @@ function navegar(dOI){if(typeof dOI==='number'&&dOI>=0&&dOI<chaves.length){chave
 function toggleCirculo1(){toggleEstado('circulo1');} function toggleCirculo2(){toggleEstado('circulo2');} function toggleCirculo3(){toggleEstado('circulo3');} function toggleCirculo4(){toggleEstado('circulo4');} function toggleCirculo5(){toggleEstado('circulo5');} function toggleCirculo6(){toggleEstado('circulo6');} function toggleCirculo7(){toggleEstado('circulo7');} function toggleCirculo8(){toggleEstado('circulo8');}
 function ativarChave(){const c=chaves[chaveAtual];if(c)alert(`Ativando: ${c.nome}`);}
 function moverCarrossel(d){const c=document.querySelector('.carrossel-diamantes');if(!c)return;const i=c.querySelectorAll('.diamante-item');if(i.length===0)return;i.forEach(item=>item.classList.remove('ativo'));posicaoCarrossel=(posicaoCarrossel+d+i.length)%i.length;if(i[posicaoCarrossel]){i[posicaoCarrossel].classList.add('ativo');const t=i[posicaoCarrossel].offsetWidth+10;const sT=(posicaoCarrossel*t)-(c.offsetWidth/2)+(t/2);c.scrollTo({left:sT,behavior:'smooth'});}}
+// Funções abrir/fechar/expandir janela de filho usam as genéricas abrirJanela, fecharJanela, expandirJanela
 
 // =========================================================================
 // FUNÇÕES INTERNAS (Não chamadas diretamente pelo HTML)
 // =========================================================================
 function centralizarElementosPlayer(){const c=document.querySelector('.capa-musica-isaac');const p=document.querySelector('.player-musica-isaac');if(c&&p){c.style.margin='auto';p.style.display='flex';p.style.flexDirection='column';p.style.alignItems='center';p.style.justifyContent='space-between';}}
-function selecionarMusica(id){const m=listaDeMusicas.find(i=>i.id===id);if(m&&audio&&audioSource&&playerMusica){document.querySelector('.nome-musica-isaac').textContent=m.nome;document.querySelector('.autor-musica-isaac').textContent=m.autor;const cE=document.querySelector('.capa-musica-isaac img');cE.src=m.capa;cE.onerror=()=>{cE.src='assets/Imagens Isaac/default_capa.png';console.error(`Erro capa: ${m.capa}`);}document.querySelector('.player-musica-isaac').style.backgroundImage=`linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.6)), url('${m.background}')`;audioSource.src=m.link;audio.load();audio.oncanplaythrough=()=>{if(musicaTocando&&playerMusica.style.display==='flex'){audio.play().catch(e=>console.warn("Play canplaythrough bloqueado",e));}};atualizarFavoritoVisual(id);/*atualizarBotaoPlay();*/}}
+function selecionarMusica(id){const m=listaDeMusicas.find(i=>i.id===id);if(m&&audio&&audioSource&&playerMusica){document.querySelector('.nome-musica-isaac').textContent=m.nome;document.querySelector('.autor-musica-isaac').textContent=m.autor;const cE=document.querySelector('.capa-musica-isaac img');cE.src=m.capa;cE.onerror=()=>{cE.src='assets/Imagens Isaac/default_capa.png';console.error(`Erro capa: ${m.capa}`);}document.querySelector('.player-musica-isaac').style.backgroundImage=`linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.6)), url('${m.background}')`;audioSource.src=m.link;audio.load();/* removido play automático aqui e oncanplaythrough problemático */ atualizarFavoritoVisual(id);/*atualizarBotaoPlay();*/}}
 function atualizarFavoritoVisual(id){const b=document.querySelector('.botao-favoritar-isaac');if(b){if(musicasFavoritadas[id]){b.classList.add('favoritado');b.textContent='💖';}else{b.classList.remove('favoritado');b.textContent='🤍';}}}
 function atualizarBotaoPlay(){const b=document.querySelector('.botao-controle-isaac:nth-child(2)');if(b)b.textContent=musicaTocando?'II':'►';}
 function formatarTempo(s){if(isNaN(s)||!isFinite(s)||s<0)return"0:00";const m=Math.floor(s/60);const rS=Math.floor(s%60);return`${m}:${rS<10?'0':''}${rS}`;}
@@ -145,15 +146,14 @@ document.addEventListener("DOMContentLoaded", function () {
             audio.addEventListener('play',()=>{musicaTocando=true;atualizarBotaoPlay();});
             audio.addEventListener('pause',()=>{musicaTocando=false;atualizarBotaoPlay();});
         }
-        // Listener dos botões internos que não usam onclick no HTML (se houver)
-        // No seu HTML, parece que todos usam onclick="...", então não precisamos adicionar listeners aqui
-        // A inicialização da lista e botão é feita abaixo
+        // Listener para botões internos que não usam onclick no HTML (se houver)
+        // Verificado que seu HTML usa onclick para favoritar e lista, então não precisa adicionar aqui.
     }
 
-    // Inicializa Lista de Músicas (se existir no DOM inicial)
+    // Inicializa Lista de Músicas
     if (document.getElementById('listaMusicas')) {
          atualizarListaMusicas();
-         // selecionarMusica(1); // Removido daqui, será chamado ao abrir o player
+         // Não selecionar música inicial aqui
          document.getElementById('listaMusicas').style.display = 'none';
          atualizarBotaoPlay();
     }
@@ -165,10 +165,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Configura Carrossel Títulos ---
     const carrosselEl = document.querySelector('.carrossel-imagens');
     const carrosselContainerEl = document.querySelector('.carrossel-titulos');
+    pausarCarrosselTitulosFunc = pausarCarrossel;
+    iniciarCarrosselTitulosFunc = iniciarCarrossel;
     if(carrosselEl && carrosselContainerEl){
         iniciarCarrossel();
         carrosselContainerEl.addEventListener('mouseover', pausarCarrossel);
         carrosselContainerEl.addEventListener('mouseout', iniciarCarrossel);
+        // Listener de clique removido, pois o HTML já tem onclick="abrirJanelaTitulo(id)"
     }
     document.querySelectorAll('.janela-titulos').forEach(addDragEventsToWindow);
 
@@ -210,7 +213,6 @@ document.addEventListener("DOMContentLoaded", function () {
     atualizarStatusTemporarias('grupo-enjoo', 0); atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0);
     atualizarStatusTemporarias('grupo-ansiedade', 0); atualizarStatusTemporarias('grupo-medo', 0);
     atualizarStatusTemporarias('grupo-tedio', 0); atualizarStatusTemporarias('grupo-raiva', 0);
-    // Não há grupo-desgaste nas temporárias no seu HTML
 
     // --- Atualiza Aether ---
     atualizarAether(porcentagemAether);
@@ -243,4 +245,4 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Script.js: DOMContentLoaded concluído.");
 }); // FIM DO DOMContentLoaded
 
-console.log("Script.js totalmente carregado (Baseado no original com caminhos relativos).");
+console.log("Script.js totalmente carregado (Baseado no original com caminhos relativos verificados).");
