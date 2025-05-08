@@ -13,10 +13,7 @@
         }
     }
 
-    // Carregar a seção da música e configurar o player
-    // ATENÇÃO: A definição de loadSection está duplicada no final. Usando a segunda.
-    // A definição única será mantida no final, conforme seu original, mas isso pode causar problemas.
-    // Idealmente, a definição correta deveria estar no topo.
+   
 
     loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
         // Procura o iframe DENTRO da seção carregada
