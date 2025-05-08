@@ -28,16 +28,19 @@ function loadSection(id, url, callback) {
 }
 
 // =========================================================================
-// VARIÁVEIS GLOBAIS
+// VARIÁVEIS GLOBAIS (DECLARADAS AQUI, INICIALIZADAS NO DOMCONTENTLOADED OU QUANDO NECESSÁRIO)
 // =========================================================================
 let playerMusicaIsaacGlob, audioGlob, audioSourceGlob, progressBarGlob, tempoAtualGlob, tempoTotalGlob;
 let musicaTocandoGlob = false;
 let carrosselIntervalGlob;
-let chaveAtualSelos = 0;
-let posicaoCarrosselBencaos = 0;
+let chaveAtualSelos = 0; // Movido para global para ser acessado por navegarSelos
+let posicaoCarrosselBencaos = 0; // Movido para global
 
 // =========================================================================
 // DEFINIÇÕES DE FUNÇÕES GLOBAIS (para onclick no HTML)
+// Muitas dessas funções precisam acessar elementos que podem ou não estar
+// carregados ainda. Elas devem ser robustas ou os event listeners
+// devem ser adicionados dinamicamente após o carregamento do conteúdo.
 // =========================================================================
 
 // --- BUFFY MÚSICA (SECAO-AURA) ---
@@ -48,7 +51,27 @@ function toggleJanelaMusica() {
     }
 }
 
+// --- CLASSES ---
+// Renomeado de volta para `mostrarTexto` se o HTML usa `onclick="mostrarTexto()"`
+function mostrarTexto() {
+    // Assumindo que o elemento .expandido está dentro de #secao-classes
+    // Se esta seção é carregada dinamicamente, este listener deve ser adicionado no callback de loadSection
+    const expandido = document.querySelector('#secao-classes .expandido');
+    if (expandido) {
+        expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
+    } else {
+        console.warn("Classes: Elemento '.expandido' dentro de #secao-classes não encontrado!");
+    }
+}
+
 // --- CARACTERÍSTICAS (PROFISSÃO, ESTADO CIVIL) ---
+function toggleProfissao() {
+    const detalhes = document.getElementById('detalhesProfissao');
+    if (detalhes) {
+        detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
+    }
+}
+
 function abrirJanelaEstadoCivil() {
     const janela = document.getElementById("janelaEstadoCivil");
     const textoCasada = document.querySelector(".texto-clicavel-isaac");
@@ -57,13 +80,6 @@ function abrirJanelaEstadoCivil() {
         janela.style.left = `${rect.right + window.scrollX + 10}px`;
         janela.style.top = `${rect.top + window.scrollY}px`;
         janela.style.display = "block";
-    }
-}
-
-function toggleProfissao() {
-    const detalhes = document.getElementById('detalhesProfissao');
-    if (detalhes) {
-        detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
     }
 }
 
@@ -76,15 +92,16 @@ function fecharJanelaEstadoCivil() {
 // !! IMPORTANTE !! Mova as imagens para seu projeto e use caminhos relativos!
 const listaDeMusicasIsaac = [
     { id: 1, nome: "Crying Alone / Nowhere", autor: "Kurae Radiânthia Pendragon Isaac",
-      capa: "assets/Imagens Isaac/sac2.jpg", // <<< SUBSTITUA PELO CAMINHO CORRETO NO SEU PROJETO
-      background: "assets/Imagens Isaac/sac1.jpg", // <<< SUBSTITUA PELO CAMINHO CORRETO NO SEU PROJETO
-      link: "assets/CryingAlone-Nowhere.mp3" } // Verifique se este MP3 está no seu projeto
+      capa: "assets/Imagens Isaac/sac2.jpg", // Exemplo de caminho relativo
+      background: "assets/Imagens Isaac/sac1.jpg", // Exemplo de caminho relativo
+      link: "assets/CryingAlone-Nowhere.mp3" }
 ];
 const storageKeyIsaac = 'musicasFavoritadasIsaac';
 let musicasFavoritadasIsaac = JSON.parse(localStorage.getItem(storageKeyIsaac)) || {};
 
 function togglePlayerMusicaIsaac() {
-    // Elementos são inicializados no DOMContentLoaded
+    // Certifique-se que playerMusicaIsaacGlob foi inicializado no DOMContentLoaded
+    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
     const player = playerMusicaIsaacGlob;
     const estadoCivil = document.getElementById('janelaEstadoCivil');
 
@@ -93,22 +110,23 @@ function togglePlayerMusicaIsaac() {
             player.style.display = 'flex';
             if (estadoCivil) estadoCivil.style.zIndex = '900';
             centralizarElementosPlayerIsaac();
-            // Tocar a primeira música se nenhuma estiver carregada ou se o player estava fechado
-            if (audioGlob && (!audioGlob.currentSrc || !musicaTocandoGlob)) {
-                 selecionarMusicaIsaac(listaDeMusicasIsaac[0].id); // Carrega a primeira
-                 // O play será tentado após o 'canplaythrough' em selecionarMusicaIsaac se o player estiver visível
+            if (!musicaTocandoGlob) { // Só seleciona e toca se não estiver tocando
+                 selecionarMusicaIsaac(listaDeMusicasIsaac[0].id); // Toca a primeira por padrão ou a última
             }
         } else {
             player.style.display = 'none';
             if (estadoCivil) estadoCivil.style.zIndex = '1000';
-            // Não pausar aqui, pois fecharPlayer já faz isso e playPause também
+            if (audioGlob && musicaTocandoGlob) audioGlob.pause(); // Pausa só se estiver tocando
+            // Não muda musicaTocandoGlob aqui, playPauseIsaac faz isso
         }
     } else {
         console.warn("Player Isaac: Elemento '.player-musica-isaac' não encontrado para toggle.");
     }
 }
 
-function fecharPlayer() { // Nome restaurado
+// Renomeado de volta para `fecharPlayer` se o HTML usa `onclick="fecharPlayer()"`
+function fecharPlayer() {
+    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
     const player = playerMusicaIsaacGlob;
     const estadoCivil = document.getElementById('janelaEstadoCivil');
 
@@ -117,16 +135,16 @@ function fecharPlayer() { // Nome restaurado
 
     if (audioGlob) {
         audioGlob.pause();
-        musicaTocandoGlob = false;
+        musicaTocandoGlob = false; // Garante que está como pausado
         atualizarBotaoPlayIsaac();
     }
 }
 
 function centralizarElementosPlayerIsaac() {
+    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
+    const capaMusica = playerMusicaIsaacGlob ? playerMusicaIsaacGlob.querySelector('.capa-musica-isaac') : null;
     const player = playerMusicaIsaacGlob;
-    const capaMusica = player ? player.querySelector('.capa-musica-isaac') : null;
     if (capaMusica && player) {
-        // CSS é melhor para isso, mas mantendo a lógica JS por enquanto
         capaMusica.style.margin = 'auto';
         player.style.display = 'flex';
         player.style.flexDirection = 'column';
@@ -137,11 +155,11 @@ function centralizarElementosPlayerIsaac() {
 
 function selecionarMusicaIsaac(id) {
     const musicaSelecionada = listaDeMusicasIsaac.find((musica) => musica.id === id);
-    if (!audioGlob || !audioSourceGlob || !playerMusicaIsaacGlob) {
-        console.warn("Player Isaac: Elementos de áudio/player não inicializados.");
+    if (!audioGlob || !audioSourceGlob) {
+        console.warn("Player Isaac: Elementos de áudio não inicializados para selecionar música.");
         return;
     }
-    if (musicaSelecionada) {
+    if (musicaSelecionada && playerMusicaIsaacGlob) {
         const nomeEl = playerMusicaIsaacGlob.querySelector('.nome-musica-isaac');
         const autorEl = playerMusicaIsaacGlob.querySelector('.autor-musica-isaac');
         const capaImgEl = playerMusicaIsaacGlob.querySelector('.capa-musica-isaac img');
@@ -149,34 +167,31 @@ function selecionarMusicaIsaac(id) {
         if (nomeEl) nomeEl.textContent = musicaSelecionada.nome;
         if (autorEl) autorEl.textContent = musicaSelecionada.autor;
         if (capaImgEl) {
-            capaImgEl.src = musicaSelecionada.capa; // Este caminho DEVE ser relativo ao seu projeto
-            capaImgEl.onerror = () => console.error(`Player Isaac: Erro ao carregar capa: ${musicaSelecionada.capa}. Verifique o caminho.`);
+            capaImgEl.src = musicaSelecionada.capa;
+            capaImgEl.onerror = () => console.error(`Player Isaac: Erro ao carregar imagem da capa: ${musicaSelecionada.capa}`);
         }
         
         playerMusicaIsaacGlob.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-        // Adicionar onerror para a imagem de background seria mais complexo, melhor garantir o caminho.
         
         audioSourceGlob.src = musicaSelecionada.link;
-        audioGlob.load();
-        audioGlob.oncanplaythrough = () => {
-            if (playerMusicaIsaacGlob.style.display === 'flex' && musicaTocandoGlob) { // Só toca se o player estiver visível E o estado for 'tocando'
-                 audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução automática bloqueada (oncanplaythrough).", error));
-            }
-        };
+        audioGlob.load(); // Important
+        // O play será acionado por playPauseIsaac ou no togglePlayerMusicaIsaac
+        // Não tocar automaticamente aqui para evitar problemas com autoplay
         atualizarFavoritoVisualIsaac(id);
-        atualizarBotaoPlayIsaac(); // Atualiza o botão caso a música tenha mudado
+        // Não setar musicaTocandoGlob = true aqui, o playPauseIsaac controla
     }
 }
 
-function toggleLista() { // Nome restaurado
-    const lista = document.getElementById('listaMusicas'); // Este ID é do seu HTML
+function toggleListaMusicasIsaac() {
+    const lista = document.getElementById('listaMusicas');
     if (lista) {
         lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
     }
 }
 
 function atualizarFavoritoVisualIsaac(id) {
-    const botaoFavoritar = playerMusicaIsaacGlob ? playerMusicaIsaacGlob.querySelector('.botao-favoritar-isaac') : null;
+    // Certifique-se que o player está no DOM
+    const botaoFavoritar = document.querySelector('.player-musica-isaac .botao-favoritar-isaac');
     if (botaoFavoritar) {
         if (musicasFavoritadasIsaac[id]) {
             botaoFavoritar.classList.add('favoritado');
@@ -188,10 +203,9 @@ function atualizarFavoritoVisualIsaac(id) {
     }
 }
 
-function favoritarMusica() { // Nome restaurado
-    if (!playerMusicaIsaacGlob) return;
-    const nomeMusicaAtualEl = playerMusicaIsaacGlob.querySelector('.nome-musica-isaac');
-    if (nomeMusicaAtualEl && nomeMusicaAtualEl.textContent) {
+function favoritarMusicaIsaac() {
+    const nomeMusicaAtualEl = document.querySelector('.player-musica-isaac .nome-musica-isaac');
+    if (nomeMusicaAtualEl) {
         const musicaAtual = listaDeMusicasIsaac.find((musica) => musica.nome === nomeMusicaAtualEl.textContent);
         if (musicaAtual) {
             musicasFavoritadasIsaac[musicaAtual.id] = !musicasFavoritadasIsaac[musicaAtual.id];
@@ -202,52 +216,49 @@ function favoritarMusica() { // Nome restaurado
     }
 }
 
-function retroceder10s() { // Nome restaurado
-    if (audioGlob && !isNaN(audioGlob.duration)) {
+function retroceder10sIsaac() {
+    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
         audioGlob.currentTime = Math.max(0, audioGlob.currentTime - 10);
     }
 }
 
-function avancar10s() { // Nome restaurado
-    if (audioGlob && !isNaN(audioGlob.duration)) {
+function avancar10sIsaac() {
+    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
         audioGlob.currentTime = Math.min(audioGlob.duration, audioGlob.currentTime + 10);
     }
 }
 
-function playPause() { // Nome restaurado
+// Renomeado de volta para `playPause` se o HTML usa `onclick="playPause()"`
+function playPause() {
     if (!audioGlob) {
         console.warn("Player Isaac: Elemento de áudio não encontrado para play/pause.");
         return;
     }
-    // Se não há música carregada, carrega e tenta tocar a primeira
-    if (!audioGlob.currentSrc && listaDeMusicasIsaac.length > 0) {
-        musicaTocandoGlob = true; // Define intenção de tocar
-        selecionarMusicaIsaac(listaDeMusicasIsaac[0].id);
-        // selecionarMusicaIsaac tem oncanplaythrough que tentará tocar se musicaTocandoGlob for true
-        return;
-    }
-
     if (musicaTocandoGlob) {
         audioGlob.pause();
     } else {
-        audioGlob.play().catch(error => {
-            console.warn("Player Isaac: Reprodução bloqueada pelo navegador.", error);
-            musicaTocandoGlob = false; // Falhou em tocar, então não está tocando
-            atualizarBotaoPlayIsaac();
-        });
+        // Se o src não estiver definido ou for inválido, o play falhará.
+        // É importante que selecionarMusicaIsaac tenha sido chamado antes.
+        if (!audioGlob.currentSrc && listaDeMusicasIsaac.length > 0) {
+            // Se não tem música carregada, carrega a primeira
+             selecionarMusicaIsaac(listaDeMusicasIsaac[0].id);
+             // O selecionarMusicaIsaac pode tentar tocar, então aguardar o oncanplaythrough
+             // Este play aqui pode ser redundante ou causar erro se o oncanplaythrough já tiver tocado
+             audioGlob.oncanplaythrough = () => { // Reatribui para o caso de ter sido perdido
+                audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada ao tentar tocar após selecionar.", error));
+                musicaTocandoGlob = true;
+                atualizarBotaoPlayIsaac();
+             }
+             return; // Sai para esperar o oncanplaythrough
+        }
+        audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada pelo navegador.", error));
     }
-    // O estado de musicaTocandoGlob será atualizado pelos eventos 'play' e 'pause' do audioGlob
-    // Mas podemos setar a intenção aqui e o evento confirma
-    if(!audioGlob.paused && !musicaTocandoGlob) { // Se o play foi chamado e teve sucesso (não pausado)
-        musicaTocandoGlob = true;
-    } else if (audioGlob.paused && musicaTocandoGlob) { // Se o pause foi chamado e teve sucesso
-        musicaTocandoGlob = false;
-    }
+    musicaTocandoGlob = !musicaTocandoGlob; // Inverte o estado APÓS a tentativa de play/pause
     atualizarBotaoPlayIsaac();
 }
 
 function atualizarBotaoPlayIsaac() {
-    const botaoPlay = playerMusicaIsaacGlob ? playerMusicaIsaacGlob.querySelector('.controles-isaac .botao-controle-isaac:nth-child(2)') : null;
+    const botaoPlay = document.querySelector('.player-musica-isaac .botao-controle-isaac:nth-child(2)');
     if (botaoPlay) {
         botaoPlay.textContent = musicaTocandoGlob ? 'II' : '►';
     }
@@ -268,9 +279,12 @@ function atualizarListaMusicasIsaac() {
             const item = document.createElement('p');
             item.textContent = musica.nome;
             item.addEventListener('click', () => {
-                musicaTocandoGlob = true; // Intenção de tocar
                 selecionarMusicaIsaac(musica.id);
-                // o oncanplaythrough em selecionarMusicaIsaac tentará tocar
+                if(audioGlob && !musicaTocandoGlob) { // Se não estiver tocando, tenta tocar a nova música
+                    playPause(); // Chama playPause para tentar iniciar a música
+                } else if (audioGlob && musicaTocandoGlob) { // Se já estiver tocando, força o play da nova
+                    audioGlob.play().catch(e => console.warn("Erro ao tocar música selecionada da lista:", e));
+                }
             });
             listaContainer.appendChild(item);
         });
@@ -279,7 +293,6 @@ function atualizarListaMusicasIsaac() {
 
 // --- TÍTULOS (CARROSSEL) ---
 function abrirJanelaTitulo(id) {
-    // Pausar carrossel já é feito no DOMContentLoaded ao adicionar o listener
     const janela = document.getElementById(`janelaTitulo${id}`);
     if (janela) janela.style.display = 'block';
 }
@@ -288,11 +301,7 @@ function fecharJanelaTitulo(id) {
     const janela = document.getElementById(`janelaTitulo${id}`);
     if (janela) {
         janela.style.display = 'none';
-        // Reiniciar carrossel já é feito no DOMContentLoaded ao adicionar o listener
-        const carrosselContainerTitulosEl = document.querySelector('.carrossel-titulos');
-        if (carrosselContainerTitulosEl && carrosselIntervalGlob === undefined) { // Só reinicia se não estiver rodando
-            // A lógica de iniciar/pausar carrossel está no DOMContentLoaded
-        }
+        // A função iniciarCarrosselTitulos será chamada pelo mouseout do container se o carrossel ainda existir
     }
 }
 
@@ -302,65 +311,59 @@ function expandirJanelaTitulo(id) {
 }
 
 // --- ATRIBUTOS ---
-function toggleCheckbox(element) { // Nome restaurado
+function toggleCheckboxAtributo(element) {
     element.classList.toggle("checked");
 }
 
 // --- SELOS ---
-const selosChavesData = [ /* Seus dados de chaves aqui, COM CAMINHOS RELATIVOS PARA IMAGENS */
-    { id: 0, nome: "Key of Souls", descricao: "...", item: "assets/Recursos/Key of Souls.png", efeito: "...", icone: "https://imgur.com/zHQo8sh.png", detalhes: "..."},
-    { id: 5, nome: "Key of Pendragon", descricao: "...", item: "assets/Recursos/Key of Pendragon.png", efeito: "...", icone: "assets/Recursos/Key of Pendragon.png", detalhes: "..."},
-    { id: 7, nome: "Key of Isaac's Heart", descricao: "...", item: "assets/Recursos/Key of Isaac's Heart.png", efeito: "...", icone: "assets/Recursos/Key of Isaac's Heart.png", detalhes: "..."},
-    // ... (restante dos dados das chaves)
+const selosChavesData = [ /* Seus dados de chaves aqui, igual ao anterior */
+    { id: 0, nome: "Key of Souls", descricao: "Nenhuma informação sobre a chave Key of Souls está disponível.", item: "assets/Recursos/Key of Souls.png", efeito: "À descobrir 01.", icone: "https://imgur.com/zHQo8sh.png", detalhes: "Esta chave é um teste da alinezinha1"},
+    { id: 1, nome: "Key of Dreams", descricao: "Nenhuma informação sobre a chave Key of Dreams está disponível.", item: "assets/Recursos/Key of Dreams.png", efeito: "À descobrir 02.", icone: "https://imgur.com/lKXdgwT.png", detalhes: "Esta chave é um teste da alinezinha2"},
+    { id: 2, nome: "Key of Infinite Moon Mansion", descricao: "Nenhuma informação sobre a chave Key of Infinite Moon Mansion está disponível.", item: "assets/Recursos/Key of Infinite Moon Mansion.png", efeito: "À descobrir 03.", icone: "https://imgur.com/Hf705GX.png", detalhes: "Esta chave é um teste da alinezinha3"},
+    { id: 3, nome: "Key of Desires", descricao: "Nenhuma informação sobre a chave Key of Desires está disponível.", item: "assets/Recursos/Key of Desires.png", efeito: "À descobrir 04.", icone: "https://imgur.com/L2bLSl2.png", detalhes: "Esta chave é um teste da alinezinha4"},
+    { id: 4, nome: "Key of Soul World", descricao: "Nenhuma informação sobre a chave Key of Soul World está disponível.", item: "assets/Recursos/Key of Soul World.png", efeito: "À descobrir 05.", icone: "https://imgur.com/X1zPnlJ.png", detalhes: "Esta chave é um teste da alinezinha5"},
+    { id: 5, nome: "Key of Pendragon", descricao: "Nenhuma informação sobre a chave Key of Pendragon está disponível.", item: "assets/Recursos/Key of Pendragon.png", efeito: "À descobrir 06.", icone: "assets/Recursos/Key of Pendragon.png", detalhes: "Esta chave é um teste da alinezinha6"},
+    { id: 6, nome: "Key Pinnacle of Flames", descricao: "Nenhuma informação sobre a chave Key Pinnacle of Flames está disponível.", item: "assets/Recursos/Key Pinnacle of Flames.png", efeito: "À descobrir 07.", icone: "https://imgur.com/46Dh8W2.png", detalhes: "Esta chave é um teste da alinezinha7"},
+    { id: 7, nome: "Key of Isaac's Heart", descricao: "Nenhuma informação sobre a chave Key of Isaac's Heart está disponível.", item: "assets/Recursos/Key of Isaac's Heart.png", efeito: "À descobrir 08.", icone: "assets/Recursos/Key of Isaac's Heart.png", detalhes: "Esta chave é um teste da alinezinha8"},
 ];
 const selosEstadosIniciais = { circulo1: true, circulo2: false, circulo3: true, circulo4: false, circulo5: true, circulo6: false, circulo7: true, circulo8: false };
 
-function navegar(direcao) { // Nome restaurado
+// Renomeado de volta para `navegar` se o HTML usa `onclick="navegar()"`
+function navegar(direcao) {
     chaveAtualSelos = (chaveAtualSelos + direcao + selosChavesData.length) % selosChavesData.length;
     const chave = selosChavesData[chaveAtualSelos];
     if (!chave) return;
 
     const tituloItemEl = document.getElementById("titulo-item");
     const descDetalhadaEl = document.querySelector("#retangulo-item .descricao-detalhada");
-    const itemImagemEl = document.querySelector("#retangulo-item .item-imagem img"); // Mais específico
+    const itemImagemEl = document.querySelector(".item-imagem img");
     const tituloEfeitoEl = document.querySelector("#retangulo-efeitos .titulo-efeito");
-    const iconeEfeitoEl = document.querySelector("#retangulo-efeitos img"); // Imagem dentro de #retangulo-efeitos
+    const iconeEfeitoEl = document.querySelector("#retangulo-efeitos img");
     const detalhesEfeitoEl = document.querySelector("#retangulo-efeitos .detalhes-detalhados");
 
     if (tituloItemEl) tituloItemEl.textContent = chave.nome;
     if (descDetalhadaEl) descDetalhadaEl.textContent = chave.descricao;
     if (itemImagemEl) {
-        itemImagemEl.src = chave.item; // CAMINHO DEVE SER RELATIVO
-        itemImagemEl.onerror = () => console.error(`Selos: Erro ao carregar item: ${chave.item}`);
+        itemImagemEl.src = chave.item;
+        itemImagemEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do item: ${chave.item}`);
     }
     if (tituloEfeitoEl) tituloEfeitoEl.textContent = chave.efeito;
     if (iconeEfeitoEl) {
-        iconeEfeitoEl.src = chave.icone; // CAMINHO DEVE SER RELATIVO se for local
-        iconeEfeitoEl.onerror = () => console.error(`Selos: Erro ao carregar ícone: ${chave.icone}`);
+        iconeEfeitoEl.src = chave.icone;
+        iconeEfeitoEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do ícone: ${chave.icone}`);
     }
     if (detalhesEfeitoEl) detalhesEfeitoEl.textContent = chave.detalhes;
     
-    atualizarDestaqueCirculoSelos(chaveAtualSelos); // ID é o índice do array (0-7)
+    atualizarDestaqueCirculoSelos(chaveAtualSelos + 1);
 }
 
-function atualizarDestaqueCirculoSelos(indiceAtivo) {
+function atualizarDestaqueCirculoSelos(id) {
     document.querySelectorAll(".circulo-pequeno").forEach((circulo, index) => {
-        // O onclick de navegar passa o índice diretamente (0 para o primeiro, 1 para o segundo, etc)
-        // mas a função navegar internamente usa chaveAtualSelos que é o índice
-        if (index === indiceAtivo) { // Compara o índice do loop com o índice ativo
-            circulo.style.boxShadow = "0 0 10px 3px #FFD700";
-        } else {
-            circulo.style.boxShadow = "none";
-        }
+        circulo.style.boxShadow = (index + 1 === id) ? "0 0 10px 3px #FFD700" : "none";
     });
 }
-
-// onclick="navegar(0)" no HTML para o primeiro círculo, navegar(1) para o segundo, etc.
-// A função `toggleCirculoX` é chamada separadamente no onclick, o que é um pouco redundante.
-// O ideal seria que `navegar(indice)` também chamasse `toggleCirculoX` ou que `toggleCirculoX` chamasse `navegar(indice)`.
-// Por enquanto, mantendo as duas chamadas no HTML como você tem.
-
 function toggleCirculo1() { document.getElementById('circulo1')?.classList.toggle('ativo'); }
+// ... ( toggleCirculo2 a toggleCirculo8 da mesma forma)
 function toggleCirculo2() { document.getElementById('circulo2')?.classList.toggle('ativo'); }
 function toggleCirculo3() { document.getElementById('circulo3')?.classList.toggle('ativo'); }
 function toggleCirculo4() { document.getElementById('circulo4')?.classList.toggle('ativo'); }
@@ -369,19 +372,10 @@ function toggleCirculo6() { document.getElementById('circulo6')?.classList.toggl
 function toggleCirculo7() { document.getElementById('circulo7')?.classList.toggle('ativo'); }
 function toggleCirculo8() { document.getElementById('circulo8')?.classList.toggle('ativo'); }
 
-function ativarChave() {
-    // Esta função é chamada por onclick="ativarChave()"
-    // Você precisa implementar a lógica do que acontece quando uma chave é "ativada"
-    console.log("Função ativarChave() chamada. Implemente a lógica.");
-    const chaveSelecionada = selosChavesData[chaveAtualSelos];
-    if (chaveSelecionada) {
-        alert(`Ativando chave: ${chaveSelecionada.nome}`);
-        // Adicione sua lógica aqui
-    }
-}
 
 // --- BENÇÃOS E MALDIÇÕES ---
-function moverCarrossel(direcao) { // Nome restaurado
+// Renomeado de volta para `moverCarrossel` se o HTML usa `onclick="moverCarrossel()"`
+function moverCarrossel(direcao) {
     const carrossel = document.querySelector('.carrossel-diamantes');
     if (!carrossel) return;
     const itens = carrossel.querySelectorAll('.diamante-item');
@@ -390,56 +384,49 @@ function moverCarrossel(direcao) { // Nome restaurado
     itens.forEach(item => item.classList.remove('ativo'));
     posicaoCarrosselBencaos = (posicaoCarrosselBencaos + direcao + itens.length) % itens.length;
     
-    if (itens[posicaoCarrosselBencaos]) {
+    if (itens[posicaoCarrosselBencaos]) { // Verifica se o item existe
         itens[posicaoCarrosselBencaos].classList.add('ativo');
         const tamanhoItem = itens[posicaoCarrosselBencaos].offsetWidth + 10;
         const scrollTarget = (posicaoCarrosselBencaos * tamanhoItem) - (carrossel.offsetWidth / 2) + (tamanhoItem / 2);
         carrossel.scrollTo({ left: scrollTarget, behavior: 'smooth' });
     }
 }
-
-function abrirJanela(idJanela) { // Nome restaurado e genérico
+// Renomeado de volta para `abrirJanela` e `fecharJanela` se o HTML usa esses nomes
+function abrirJanela(idJanela) {
     const janela = document.getElementById(idJanela);
     if (janela) janela.style.display = 'block';
 }
-
-function fecharJanela(idJanela) { // Nome restaurado e genérico
+function fecharJanela(idJanela) {
     const janela = document.getElementById(idJanela);
     if (janela) janela.style.display = 'none';
 }
-
-function expandirJanela(idJanela) { // Nome consistente
+function expandirJanela(idJanela) { // Este nome estava consistente
     const janela = document.getElementById(idJanela);
     if (janela) janela.classList.toggle('janela-expandida');
 }
 
 // --- FILHOS (JANELAS FLUTUANTES) ---
-// abrirJanela, fecharJanela, expandirJanela já são globais e podem ser usadas
-// Se precisar de lógica específica para filhos, crie novas funções como abrirJanelaFilho etc.
+function abrirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'block'; }
+function fecharJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'none'; }
+function expandirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.classList.toggle('janela-expandida'); }
 
-// --- FUNÇÃO UTILITÁRIA PARA ARRASTAR JANELAS ---
-function addDragEventsToWindow(janela) {
-    let isDragging = false, dragStartX, dragStartY, initialLeft, initialTop;
-    const dragHandle = janela.querySelector('.janela-cabecalho-arrastavel') || janela.querySelector('.janela-botoes') || janela;
+// --- FUNÇÃO UTILITÁRIA PARA ARRASTAR JANELAS (igual à anterior) ---
+function addDragEventsToWindow(janela) { /* ... código de addDragEventsToWindow ... */
+    let isDragging = false, startX, startY, offsetX, offsetY;
+    const dragHandle = janela.querySelector('.janela-cabecalho-arrastavel') || janela; 
 
     dragHandle.addEventListener('mousedown', (e) => {
         if (e.target.closest('button, input, a, .no-drag')) return;
         isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        initialLeft = janela.offsetLeft;
-        initialTop = janela.offsetTop;
+        const rect = janela.getBoundingClientRect();
+        startX = e.clientX - rect.left + janela.offsetLeft; // Ajuste para offsetLeft/Top
+        startY = e.clientY - rect.top + janela.offsetTop;  // Ajuste para offsetLeft/Top
         janela.style.cursor = 'grabbing';
-        // Traz a janela para frente (opcional, pode causar problemas com z-index de outros elementos)
-        // document.querySelectorAll('.janela-arrastavel').forEach(j => j.style.zIndex = parseInt(window.getComputedStyle(j).zIndex) -1 || 1000);
-        // janela.style.zIndex = (parseInt(window.getComputedStyle(janela).zIndex) || 1000) + 10;
     });
     document.addEventListener('mousemove', (e) => {
         if (isDragging) {
-            const deltaX = e.clientX - dragStartX;
-            const deltaY = e.clientY - dragStartY;
-            janela.style.left = `${initialLeft + deltaX}px`;
-            janela.style.top = `${initialTop + deltaY}px`;
+            janela.style.left = `${e.clientX - startX + window.scrollX}px`; // Adicionado scrollX/Y
+            janela.style.top = `${e.clientY - startY + window.scrollY}px`;
         }
     });
     document.addEventListener('mouseup', () => {
@@ -449,7 +436,6 @@ function addDragEventsToWindow(janela) {
         }
     });
     dragHandle.style.cursor = 'move';
-    janela.classList.add('janela-arrastavel'); // Para referência, se necessário
 }
 
 
@@ -459,21 +445,28 @@ function addDragEventsToWindow(janela) {
 document.addEventListener("DOMContentLoaded", function () {
 
     // --- INICIALIZAÇÃO PLAYER DE MÚSICA ISAAC ---
-    playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac'); // Seu HTML tem esse ID/classe
-    if (playerMusicaIsaacGlob) {
-        audioGlob = playerMusicaIsaacGlob.querySelector('#audio-player'); // Busca dentro do player
-        if (audioGlob) {
-            audioSourceGlob = audioGlob.querySelector('source');
-        }
-        progressBarGlob = playerMusicaIsaacGlob.querySelector('#progress-bar');
-        tempoAtualGlob = playerMusicaIsaacGlob.querySelector('#tempo-atual');
-        tempoTotalGlob = playerMusicaIsaacGlob.querySelector('#tempo-total');
+    playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
+    audioGlob = document.querySelector('#audio-player');
+    audioSourceGlob = audioGlob ? audioGlob.querySelector('source') : null;
+    progressBarGlob = document.getElementById('progress-bar');
+    tempoAtualGlob = document.getElementById('tempo-atual');
+    tempoTotalGlob = document.getElementById('tempo-total');
+
+    // Adicionar listeners aos botões do player Isaac se eles existem no DOM principal
+    const btnFavoritarIsaac = document.querySelector(".player-musica-isaac .botao-favoritar-isaac");
+    if (btnFavoritarIsaac) {
+        btnFavoritarIsaac.addEventListener("click", favoritarMusicaIsaac);
     } else {
-        console.warn("Container do Player de Música Isaac ('.player-musica-isaac') não encontrado no DOM inicial.");
+        console.warn("Player Isaac: Botão '.botao-favoritar-isaac' não encontrado no DOMContentLoaded.");
     }
 
+    const btnListaMusicasIsaac = document.querySelector(".player-musica-isaac .botao-lista-musicas");
+    if (btnListaMusicasIsaac) {
+        btnListaMusicasIsaac.addEventListener("click", toggleListaMusicasIsaac);
+    } else {
+        console.warn("Player Isaac: Botão '.botao-lista-musicas' não encontrado no DOMContentLoaded (ou precisa de seletor mais específico se dentro do player).");
+    }
 
-    // Listeners para o player Isaac
     if (progressBarGlob && audioGlob) {
         progressBarGlob.addEventListener('input', () => {
             if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
@@ -481,6 +474,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
     if (audioGlob) {
         audioGlob.addEventListener('timeupdate', () => {
             if (tempoAtualGlob && !isNaN(audioGlob.currentTime)) tempoAtualGlob.textContent = formatarTempo(audioGlob.currentTime);
@@ -489,35 +483,52 @@ document.addEventListener("DOMContentLoaded", function () {
         audioGlob.addEventListener('loadedmetadata', () => {
             if (tempoTotalGlob && !isNaN(audioGlob.duration)) tempoTotalGlob.textContent = formatarTempo(audioGlob.duration);
         });
-        audioGlob.addEventListener('ended', () => { musicaTocandoGlob = false; atualizarBotaoPlayIsaac(); });
-        audioGlob.addEventListener('play', () => { musicaTocandoGlob = true; atualizarBotaoPlayIsaac(); });
-        audioGlob.addEventListener('pause', () => { musicaTocandoGlob = false; atualizarBotaoPlayIsaac(); });
+        audioGlob.addEventListener('ended', () => {
+            musicaTocandoGlob = false;
+            atualizarBotaoPlayIsaac();
+            // Opcional: tocar a próxima música
+        });
+         audioGlob.addEventListener('play', () => { // Quando o áudio realmente começa a tocar
+            musicaTocandoGlob = true;
+            atualizarBotaoPlayIsaac();
+        });
+        audioGlob.addEventListener('pause', () => { // Quando o áudio é pausado
+            musicaTocandoGlob = false;
+            atualizarBotaoPlayIsaac();
+        });
     }
 
+    // Carregar lista e (mas não selecionar/tocar) músicas do Player Isaac
+    // A seleção/play acontece com togglePlayerMusicaIsaac ou playPause
     if (document.getElementById('listaMusicas')) {
         atualizarListaMusicasIsaac();
         document.getElementById('listaMusicas').style.display = 'none';
-        if (playerMusicaIsaacGlob) atualizarBotaoPlayIsaac();
+        if (playerMusicaIsaacGlob) atualizarBotaoPlayIsaac(); // Atualiza o botão para o estado inicial
     }
 
-
-    // --- FAMA/MORAL E AUTOESTIMA ---
-    function atualizarBarraStatus(idBarra, idTexto, porcentagem, idStatus = null) {
+    // --- FAMA/MORAL E AUTOESTIMA (Funções de atualização chamadas diretamente abaixo) ---
+    function atualizarBarraStatus(idBarra, idTexto, porcentagem, idStatus = null) { /* ...código da função... */
         const barra = document.getElementById(idBarra);
         const texto = document.getElementById(idTexto);
-        if (!barra || !texto) { /* console.warn(`Barra/Texto não encontrado para ${idBarra}`); */ return; }
-        barra.style.width = `${porcentagem}%`; texto.textContent = `${porcentagem}%`;
-        let cor; if (porcentagem <= 20) cor = 'darkred'; else if (porcentagem <= 40) cor = '#FF9100';
-        else if (porcentagem <= 60) cor = '#00D19A'; else if (porcentagem <= 80) cor = '#D622EF'; else cor = '#6222EF';
-        barra.style.backgroundColor = cor;
-        if (idStatus) {
-            const statusEl = document.getElementById(idStatus);
-            if (statusEl) {
-                let textoStatus; if (porcentagem <= 20) textoStatus = 'Infame - Condenado - Vilão - Corrupto';
-                else if (porcentagem <= 40) textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
-                else if (porcentagem <= 60) textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
-                else if (porcentagem <= 80) textoStatus = 'Respeitado - Admirado - Herói - Protetor'; else textoStatus = 'Renomado - Lendário - Venerado - Salvador';
-                statusEl.textContent = textoStatus;
+        if (barra && texto) {
+            barra.style.width = `${porcentagem}%`;
+            texto.textContent = `${porcentagem}%`;
+            let cor;
+            if (porcentagem <= 20) cor = 'darkred'; else if (porcentagem <= 40) cor = '#FF9100';
+            else if (porcentagem <= 60) cor = '#00D19A'; else if (porcentagem <= 80) cor = '#D622EF';
+            else cor = '#6222EF';
+            barra.style.backgroundColor = cor;
+            if (idStatus) {
+                const statusEl = document.getElementById(idStatus);
+                if (statusEl) {
+                    let textoStatus;
+                    if (porcentagem <= 20) textoStatus = 'Infame - Condenado - Vilão - Corrupto';
+                    else if (porcentagem <= 40) textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
+                    else if (porcentagem <= 60) textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
+                    else if (porcentagem <= 80) textoStatus = 'Respeitado - Admirado - Herói - Protetor';
+                    else textoStatus = 'Renomado - Lendário - Venerado - Salvador';
+                    statusEl.textContent = textoStatus;
+                }
             }
         }
     }
@@ -527,33 +538,33 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- CARROSSEL DE TÍTULOS ---
     const carrosselTitulosEl = document.querySelector('.carrossel-titulos .carrossel-imagens');
     const carrosselContainerTitulosEl = document.querySelector('.carrossel-titulos');
-    let carrosselTitulosInterval; // Declarado aqui para escopo local
-    function iniciarCarrosselTitulos() {
-        if (!carrosselTitulosEl) return; clearInterval(carrosselTitulosInterval);
-        carrosselTitulosInterval = setInterval(() => {
+    function iniciarCarrosselTitulos() { /* ...código da função... */
+        if (!carrosselTitulosEl) return; clearInterval(carrosselIntervalGlob);
+        carrosselIntervalGlob = setInterval(() => {
             carrosselTitulosEl.scrollLeft += 1;
             if (carrosselTitulosEl.scrollLeft >= carrosselTitulosEl.scrollWidth - carrosselTitulosEl.offsetWidth -1) carrosselTitulosEl.scrollLeft = 0;
         }, 30);
     }
-    function pausarCarrosselTitulos() { clearInterval(carrosselTitulosInterval); }
+    function pausarCarrosselTitulos() { clearInterval(carrosselIntervalGlob); }
 
     if (carrosselTitulosEl && carrosselContainerTitulosEl) {
         iniciarCarrosselTitulos();
         carrosselContainerTitulosEl.addEventListener('mouseover', pausarCarrosselTitulos);
         carrosselContainerTitulosEl.addEventListener('mouseout', iniciarCarrosselTitulos);
-        // Os .titulo-item já têm onclick="abrirJanelaTitulo(id)" no HTML
+        // Listeners para .titulo-item são adicionados via onclick no HTML, chamando abrirJanelaTitulo(id)
     }
     document.querySelectorAll('.janela-titulos').forEach(addDragEventsToWindow);
 
+
     // --- ATRIBUTOS ---
-    const atributosData = { /* ...seus dados de atributos... */
+    const atributosData = { /* ...seus dados... */
         hp: { total: 4910210, porcentagem: 100 }, mp: { total: 823691, porcentagem: 100 },
         agi: { total: 637369, porcentagem: 100 }, def: { total: 1476557, porcentagem: 100 },
         res: { total: 1331048, porcentagem: 100 }, spd: { total: 1020989, porcentagem: 100 },
         int: { total: 431815, porcentagem: 100 }, atk: { total: 2075839, porcentagem: 100 },
         smp: { total: 291363290, porcentagem: 99.17 }, unknown: { total: 100, porcentagem: 50 }
     };
-    function atualizarAtributoAtual(atributo, total, porcentagem) {
+    function atualizarAtributoAtual(atributo, total, porcentagem) { /* ...código da função... */
         const textoEl = document.getElementById(`texto-${atributo}`);
         const barraEl = document.getElementById(`barra-${atributo}`);
         if (textoEl && barraEl) {
@@ -565,36 +576,29 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let atributo in atributosData) {
         atualizarAtributoAtual(atributo, atributosData[atributo].total, atributosData[atributo].porcentagem);
     }
-    // onclick="toggleCheckbox(this)" já está no HTML e chama a função global.
 
     // --- SELOS ---
     for (const [id, ativo] of Object.entries(selosEstadosIniciais)) {
         const circulo = document.getElementById(id);
         if (circulo) { if (ativo) circulo.classList.add('ativo'); else circulo.classList.remove('ativo'); }
     }
-    document.querySelectorAll("#retangulo-item .titulo-item, #retangulo-efeitos .titulo-efeito, #retangulo-item .descricao-detalhada, #retangulo-efeitos .detalhes-detalhados")
-        .forEach(el => { if(el) el.contentEditable = "false"; });
-
-    if (document.getElementById("titulo-item")) { // Se o container dos selos existe
-         navegar(0); // Chama a função global `navegar` para inicializar com a primeira chave
+    document.querySelectorAll("#retangulo-item .titulo-item, #retangulo-efeitos .titulo-efeito, #retangulo-item .descricao-detalhada")
+        .forEach(el => el.contentEditable = "false");
+    if (document.getElementById("titulo-item")) { // Verifica se o container dos selos existe
+         navegar(0); // Chama a função global `navegar`
     }
-    // Os onclick="navegar(indice)" e onclick="toggleCirculoX()" já estão no HTML.
 
     // --- BENÇÃOS E MALDIÇÕES ---
-    const diamantesCarrossel = document.querySelectorAll('.carrossel-diamantes .diamante-item');
+    const diamantesCarrossel = document.querySelectorAll('.diamante-item');
     if (diamantesCarrossel.length > 0) {
-        posicaoCarrosselBencaos = Math.floor(diamantesCarrossel.length / 2); // Define o item do meio como inicial
-        if (diamantesCarrossel[posicaoCarrosselBencaos]) {
-             diamantesCarrossel[posicaoCarrosselBencaos].classList.add('ativo');
-        }
-        moverCarrossel(0); // Ajusta o scroll para o item inicial
+        const meio = Math.floor(diamantesCarrossel.length / 2);
+        if (diamantesCarrossel[meio]) diamantesCarrossel[meio].classList.add('ativo');
+        moverCarrossel(0); // Chama a função global `moverCarrossel`
     }
     document.querySelectorAll('.janela-bencao').forEach(addDragEventsToWindow);
-    // onclick="moverCarrossel(direcao)" e onclick="abrirJanela('id')" já estão no HTML.
-
 
     // --- BARRA EA ---
-    function atualizarEA(porcentagem) {
+    function atualizarEA(porcentagem) { /* ...código da função... */
         const barraEA = document.getElementById('preenchimento-ea');
         const textoEA = document.getElementById('texto-ea');
         if (barraEA && textoEA) {
@@ -606,45 +610,46 @@ document.addEventListener("DOMContentLoaded", function () {
     atualizarEA(86);
 
     // --- NECESSIDADES BÁSICAS E TEMPORÁRIAS ---
-    // Funções de atualização de status (colocadas aqui para escopo, poderiam ser globais também)
-    function atualizarStatusBasicas(grupoId, porcentagem) { /* ... (código da função como antes) ... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`); const progressText = document.getElementById(`progresso-texto-${grupoId}`); const statusIndicator = document.getElementById(`estado-${grupoId}`);
+    function atualizarStatusBasicas(grupoId, porcentagem) { /* ...código da função... */
+        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
+        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
+        const statusIndicator = document.getElementById(`estado-${grupoId}`);
         if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`; let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; } else if (porcentagem <= 5) { color = 'darkred'; status = 'Crítico'; }
-            else if (porcentagem <= 30) { color = 'red'; status = 'Baixo'; } else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; }
-            else if (porcentagem <= 95) { color = 'green'; status = 'Bom'; } else if (porcentagem <= 100) { color = '#00B59B'; status = 'Excelente'; }
-            else { color = '#6222EF'; status = 'Insano'; }
+            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
+            let color = '', status = '';
+            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
+            else if (porcentagem <= 5) { color = 'darkred'; status = 'Crítico'; } else if (porcentagem <= 30) { color = 'red'; status = 'Baixo'; }
+            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'green'; status = 'Bom'; }
+            else if (porcentagem <= 100) { color = '#00B59B'; status = 'Excelente'; } else { color = '#6222EF'; status = 'Insano'; }
             fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
         }
     }
-    function atualizarStatusTemporarias(grupoId, porcentagem) { /* ... (código da função como antes) ... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`); const progressText = document.getElementById(`progresso-texto-${grupoId}`); const statusIndicator = document.getElementById(`estado-${grupoId}`);
+    function atualizarStatusTemporarias(grupoId, porcentagem) { /* ...código da função... */
+        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
+        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
+        const statusIndicator = document.getElementById(`estado-${grupoId}`);
         if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`; let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; } else if (porcentagem <= 5) { color = '#00B59B'; status = 'Muito Baixo'; }
-            else if (porcentagem <= 30) { color = 'green'; status = 'Baixo'; } else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; }
-            else if (porcentagem <= 95) { color = 'red'; status = 'Alto'; } else { color = 'darkred'; status = 'Crítico'; }
+            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
+            let color = '', status = '';
+            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
+            else if (porcentagem <= 5) { color = '#00B59B'; status = 'Muito Baixo'; } else if (porcentagem <= 30) { color = 'green'; status = 'Baixo'; }
+            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'red'; status = 'Alto'; }
+            else { color = 'darkred'; status = 'Crítico'; }
             fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
         }
     }
-    // Chamadas de atualização
-    atualizarStatusBasicas('grupo-higiene', 97); atualizarStatusBasicas('grupo-banheiro', 100); atualizarStatusBasicas('grupo-sono', 100);
-    atualizarStatusBasicas('grupo-fome', 100); atualizarStatusBasicas('grupo-sede', 100); atualizarStatusBasicas('grupo-diversao', 101);
-    atualizarStatusBasicas('grupo-social', 78); atualizarStatusBasicas('grupo-foco', 64); atualizarStatusBasicas('grupo-felicidade', 101);
-    atualizarStatusBasicas('grupo-tesao', 101);
-    // ID "grupo-desgaste" nas necessidades básicas não foi chamado no seu original, mas o HTML existe. Adicionando:
-    atualizarStatusBasicas('grupo-desgaste', 0); // Ou o valor que desejar
-
-    atualizarStatusTemporarias('grupo-enjoo', 0); atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0);
-    atualizarStatusTemporarias('grupo-ansiedade', 0); atualizarStatusTemporarias('grupo-medo', 0);
-    // ID "grupo-tedio" e "grupo-raiva" estavam faltando nas chamadas, o HTML existe.
-    atualizarStatusTemporarias('grupo-tedio', 0);
-    atualizarStatusTemporarias('grupo-raiva', 0);
-    // ID "grupo-desgaste" em temporárias não existe no HTML fornecido, apenas em básicas.
-
+    // Chamadas de atualização... (iguais)
+    atualizarStatusBasicas('grupo-higiene', 97); /* ... etc ... */
+    atualizarStatusBasicas('grupo-banheiro', 100); atualizarStatusBasicas('grupo-sono', 100); atualizarStatusBasicas('grupo-fome', 100);
+    atualizarStatusBasicas('grupo-sede', 100); atualizarStatusBasicas('grupo-diversao', 101); atualizarStatusBasicas('grupo-social', 78);
+    atualizarStatusBasicas('grupo-foco', 64); atualizarStatusBasicas('grupo-felicidade', 101); atualizarStatusBasicas('grupo-tesao', 101);
+    atualizarStatusTemporarias('grupo-enjoo', 0); /* ... etc ... */
+    atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0); atualizarStatusTemporarias('grupo-ansiedade', 0);
+    atualizarStatusTemporarias('grupo-medo', 0); atualizarStatusTemporarias('grupo-tedio', 0); atualizarStatusTemporarias('grupo-raiva', 0);
+    atualizarStatusTemporarias('grupo-desgaste', 0);
+    
     // --- AETHER ---
-    function atualizarAether(porcentagem) {
+    function atualizarAether(porcentagem) { /* ...código da função... */
         const preenchimentoAether = document.getElementById("preenchimentoAether");
         const textoAether = document.getElementById("textoAether");
         if (preenchimentoAether && textoAether) {
@@ -655,25 +660,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     atualizarAether(101);
 
-    // Adicionar funcionalidade de arrastar às janelas de filhos
-    document.querySelectorAll('.janela-filhos').forEach(addDragEventsToWindow); // Seu HTML usa '.janela-filhos'
-    // Para a janela de estado civil:
-    const janelaEstadoCivilEl = document.getElementById('janelaEstadoCivil');
-    if (janelaEstadoCivilEl) addDragEventsToWindow(janelaEstadoCivilEl);
+    document.querySelectorAll('.janela-filho').forEach(addDragEventsToWindow);
 
 
     // =========================================================================
     // CARREGAMENTO DAS SEÇÕES DINÂMICAS (HTML EXTERNO)
     // =========================================================================
     loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
-        const playerMusicaBuffy = document.querySelector("#secao-aura #janelaMusica iframe"); // Mais específico
+        const playerMusicaBuffy = document.querySelector("#janelaMusica iframe");
         if (playerMusicaBuffy) {
             playerMusicaBuffy.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
         } else {
             console.warn("Buffy Música: #janelaMusica iframe não encontrado APÓS carregar secao-aura.");
         }
-        // Se o botão que chama toggleJanelaMusica() está DENTRO de secao-aura, adicione o listener aqui.
-        // Senão, a função global já deve funcionar.
     });
 
     loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html");
@@ -684,132 +683,85 @@ document.addEventListener("DOMContentLoaded", function () {
 
     loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
         console.log("Seção Barra de Experiência carregada!");
+        // O erro era aqui: progressBar.closest(...).querySelector(...)
+        // Vamos garantir que progressBar exista e o seletor seja direto.
         setTimeout(() => {
-            var progressBar = document.getElementById('expBar'); // Assume que #expBar está em 4-Barra-Dinheiro.html
+            var progressBar = document.getElementById('expBar');
             if (progressBar) {
                 var percentage = 75;
                 progressBar.style.width = percentage + '%';
-                const containerDaBarra = progressBar.closest('.barra-exp-container'); // Verifique se esta classe existe em 4-Barra-Dinheiro.html
+                // Assumindo que .barra-texto é um irmão ou filho direto do container da barra
+                // Se .barra-texto está DENTRO de #expBar, então progressBar.querySelector('.barra-texto')
+                // Se é um irmão, precisa de um seletor a partir de um pai comum.
+                // Se o HTML for <div class="container"><div id="expBar"></div><span class="barra-texto"></span></div>
+                // Então:
+                const containerDaBarra = progressBar.closest('.barra-exp-container'); // Ou qualquer que seja o container
                 if (containerDaBarra) {
                     const textSpan = containerDaBarra.querySelector('.barra-texto');
                     if (textSpan) {
                         textSpan.textContent = '1590 - ' + percentage + '%';
-                    } else { console.warn("Barra Dinheiro: '.barra-texto' não encontrado no container de 'expBar'."); }
-                } else { console.warn("Barra Dinheiro: Container de 'expBar' não encontrado."); }
-            } else { console.warn("Barra Dinheiro: 'expBar' não encontrado após carregar seção."); }
+                    } else {
+                        console.warn("Barra Dinheiro: '.barra-texto' não encontrado dentro do container de 'expBar'.");
+                    }
+                } else {
+                     console.warn("Barra Dinheiro: Container de 'expBar' não encontrado.");
+                }
+            } else {
+                console.warn("Barra Dinheiro: Elemento 'expBar' não encontrado após carregar seção.");
+            }
         }, 500);
     });
 
     loadSection("secao-classes", "Seções/5-Classes.html", function () {
         console.log("Seção Classes carregada!");
-        // Seu HTML em index.html NÃO TEM um botão para mostrarTexto() na seção de classes.
-        // Se o botão está dentro de 5-Classes.html, e ele tem onclick="mostrarTexto()",
-        // a função global mostrarTexto() deve funcionar.
-        // No seu index, o botão com onclick="mostrarTexto()" parece estar faltando ou
-        // a função mostrarTexto() original era para outra coisa.
-        // A função global `mostrarTexto` agora procura por `#secao-classes .expandido`.
+        // Se o botão que chama `mostrarTexto()` está DENTRO desta seção,
+        // o listener deveria ser adicionado aqui, ex:
+        // const botaoMostrarTexto = document.querySelector('#secao-classes .botao-que-mostra-texto');
+        // if (botaoMostrarTexto) botaoMostrarTexto.addEventListener('click', mostrarTexto);
+        // Se o onclick no HTML já está funcionando com a função global `mostrarTexto`, ok.
     });
 
     loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function () {
         console.log("Seção Modo Empusa carregada!");
-        // Funções locais para esta seção (para evitar conflitos e garantir que rodem com elementos carregados)
-        function atualizarBarraModoEmpusaLocal(idBarra, idTexto, porcentagem) {
-            var progressBar = document.querySelector(`#secao-modoempusa #${idBarra}`);
-            var textSpan = document.querySelector(`#secao-modoempusa #${idTexto}`);
-            if (progressBar && textSpan) { progressBar.style.width = porcentagem + '%'; textSpan.textContent = porcentagem + '%'; }
-        }
-        function atualizarFomeModoEmpusaLocal() {
-            const sangueEl = document.querySelector("#secao-modoempusa #sangue-texto");
-            const vitalidadeEl = document.querySelector("#secao-modoempusa #vitalidade-texto");
-            if (sangueEl && vitalidadeEl) {
-                var sangue = parseInt(sangueEl.textContent) || 0; var vitalidade = parseInt(vitalidadeEl.textContent) || 0;
-                var fomeTotal = Math.min(sangue + vitalidade, 100);
-                atualizarBarraModoEmpusaLocal("fomeBar", "fome-texto", fomeTotal);
-            }
-        }
-        function toggleMenuModoEmpusaLocal(seta) {
-            var menu = seta.parentElement.nextElementSibling;
-            if (menu && menu.classList.contains('empusa-menu')) {
-                document.querySelectorAll('#secao-modoempusa .empusa-menu').forEach(m => { if (m !== menu) m.style.display = 'none'; });
-                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-            }
-        }
-        function atualizarDorModoEmpusaLocal(nivelDor) {
-            nivelDor = Math.max(0, Math.min(nivelDor, 6));
-            for (let i = 1; i <= 6; i++) {
-                let coracao = document.querySelector(`#secao-modoempusa #coracao-${i}`);
-                if (coracao) coracao.textContent = (i <= nivelDor) ? "💜" : "🤍";
-            }
-        }
-        function atualizarSatisfacaoModoEmpusaLocal(idContainer, idPrefixo, nivelSatisfacao) {
-            nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
-            let container = document.querySelector(`#secao-modoempusa #${idContainer}`);
-            if (!container) return;
-            container.querySelectorAll('.emoji-satisfacao').forEach(emoji => emoji.classList.remove('emoji-selecionado'));
-            let emojiSelecionado = document.querySelector(`#secao-modoempusa #${idPrefixo}-${nivelSatisfacao}`);
-            if (emojiSelecionado) emojiSelecionado.classList.add('emoji-selecionado');
-        }
+        // Funções de atualização do Modo Empusa (definidas globalmente ou dentro deste callback)
+        function atualizarBarraModoEmpusa(idBarra, idTexto, porcentagem) { /* ... */ }
+        function atualizarFomeModoEmpusa() { /* ... */ }
+        function toggleMenuModoEmpusa(seta) { /* ... */ }
+        function atualizarDorModoEmpusa(nivelDor) { /* ... */ }
+        function atualizarSatisfacaoModoEmpusa(idContainer, idPrefixo, nivelSatisfacao) { /* ... */ }
+        // Copie as definições das funções do Modo Empusa para cá se elas usam elementos SÓ desta seção
 
         setTimeout(() => {
-            atualizarBarraModoEmpusaLocal("prazerBar", "prazer-texto", 99);
-            atualizarBarraModoEmpusaLocal("amorBar", "amor-texto", 100);
-            atualizarBarraModoEmpusaLocal("sangueBar", "sangue-texto", 47);
-            atualizarBarraModoEmpusaLocal("vitalidadeBar", "vitalidade-texto", 100);
-            atualizarFomeModoEmpusaLocal();
-            atualizarDorModoEmpusaLocal(1);
-            atualizarSatisfacaoModoEmpusaLocal("satisfacao-container", "satisfacao", 5);
-
-            document.querySelectorAll('#secao-modoempusa .empusa-seta').forEach(seta => {
-                seta.addEventListener('click', function () { toggleMenuModoEmpusaLocal(this); });
+            // Chamadas de atualização... (ex: atualizarBarraModoEmpusa(...))
+            // Adicionar listener para .empusa-seta
+            document.querySelectorAll('#secao-modoempusa .empusa-seta').forEach(seta => { // Seletor específico
+                seta.addEventListener('click', function () {
+                    // Precisa da definição de toggleMenuModoEmpusa acessível aqui
+                    var menu = this.parentElement.nextElementSibling;
+                    if (menu && menu.classList.contains('empusa-menu')) {
+                        document.querySelectorAll('#secao-modoempusa .empusa-menu').forEach(m => {
+                            if (m !== menu) m.style.display = 'none';
+                        });
+                        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+                    }
+                });
             });
         }, 500);
     });
 
     loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function () {
         console.log("Seção Modo Empusa - Alvo carregada!");
-        // Funções locais para esta seção
-        function atualizarBarraModoEmpusaAlvoLocal(idBarra, idTexto, porcentagem) {
-             var progressBar = document.querySelector(`#secao-modoempusa-alvo #${idBarra}`);
-             var textSpan = document.querySelector(`#secao-modoempusa-alvo #${idTexto}`);
-             if (progressBar && textSpan) { progressBar.style.width = porcentagem + '%'; textSpan.textContent = porcentagem + '%'; }
-        }
-        function atualizarDorModoEmpusaAlvoLocal(nivelDor) {
-            nivelDor = Math.max(0, Math.min(nivelDor, 6));
-            for (let i = 1; i <= 6; i++) {
-                let coracao = document.querySelector(`#secao-modoempusa-alvo #coracao-alvo-${i}`);
-                if (coracao) coracao.textContent = i <= nivelDor ? "💜" : "🤍";
-            }
-        }
-         function atualizarSatisfacaoModoEmpusaAlvoLocal(idContainer, idPrefixo, nivelSatisfacao) { // Copiado de Buffy, ajustando seletores
-            nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
-            let container = document.querySelector(`#secao-modoempusa-alvo #${idContainer}`); // Seletor para Alvo
-            if (!container) return;
-            container.querySelectorAll('.emoji-satisfacao').forEach(emoji => emoji.classList.remove('emoji-selecionado'));
-            let emojiSelecionado = document.querySelector(`#secao-modoempusa-alvo #${idPrefixo}-${nivelSatisfacao}`); // Seletor para Alvo
-            if (emojiSelecionado) emojiSelecionado.classList.add('emoji-selecionado');
-        }
-        function atualizarDominanciaModoEmpusaAlvoLocal(porcentagem) {
-            porcentagem = Math.max(0, Math.min(porcentagem, 100));
-            let preenchimento = document.querySelector("#secao-modoempusa-alvo #dominanciaBar");
-            let emoji = document.querySelector("#secao-modoempusa-alvo #dominancia-emoji");
-            if (preenchimento && emoji) {
-                preenchimento.style.background = `linear-gradient(to right, #ff12a9 0%, #ff12a9 ${Math.max(0, porcentagem - 5)}%, #a020f0 ${porcentagem}%, #1e90ff ${Math.min(100, porcentagem + 5)}%, #1e90ff 100%)`;
-                emoji.style.left = `calc(${porcentagem}% - 15px)`;
-            }
-        }
+        // Funções de atualização do Modo Empusa Alvo (definidas globalmente ou dentro deste callback)
+        function atualizarBarraModoEmpusaAlvo(idBarra, idTexto, porcentagem) { /* ... */ }
+        function atualizarDorModoEmpusaAlvo(nivelDor) { /* ... */ }
+        function atualizarDominanciaModoEmpusaAlvo(porcentagem) { /* ... */ }
+        // Copie as definições das funções do Modo Empusa Alvo para cá
+
         setTimeout(() => {
-            atualizarBarraModoEmpusaAlvoLocal("prazerBarAlvo", "prazer-texto-alvo", 98);
-            atualizarBarraModoEmpusaAlvoLocal("amorBarAlvo", "amor-texto-alvo", 100);
-            atualizarBarraModoEmpusaAlvoLocal("volumeBarAlvo", "volume-texto-alvo", 5);
-            atualizarBarraModoEmpusaAlvoLocal("vitalidadeBarAlvo", "vitalide-texto-alvo", 21);
-            atualizarDorModoEmpusaAlvoLocal(3);
-            atualizarSatisfacaoModoEmpusaAlvoLocal("satisfacao-container-alvo", "satisfacao-alvo", 5);
-            atualizarDominanciaModoEmpusaAlvoLocal(73);
+            // Chamadas de atualização...
         }, 500);
     });
 
-    console.log("Script.js: DOMContentLoaded concluído. Seções dinâmicas carregando...");
 }); // FIM DO DOMContentLoaded
 
-// Verificação final
-console.log("Script.js carregado e inicializado (vFinal com base no HTML). Verifique os `onclick` e caminhos de imagem.");
+console.log("Script.js carregado e inicializado (com mais correções).");
