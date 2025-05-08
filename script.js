@@ -1,5 +1,9 @@
 // =========================================================================
-// FUNÇÃO UNIVERSAL PARA CARREGAR SEÇÕES
+// script.js - BASEADO ESTRITAMENTE NO ORIGINAL + Correção Estrutural + Conversão Caminhos 'st' -> 'rep/'
+// =========================================================================
+
+// =========================================================================
+// FUNÇÃO UNIVERSAL PARA CARREGAR SEÇÕES (Definição única no topo - vinda do final do seu script)
 // =========================================================================
 function loadSection(id, url, callback) {
     fetch(url)
@@ -13,755 +17,264 @@ function loadSection(id, url, callback) {
             const targetElement = document.getElementById(id);
             if (targetElement) {
                 targetElement.innerHTML = data;
-                if (callback) {
+                // Executa o callback DEPOIS que o HTML foi injetado
+                if (callback && typeof callback === 'function') {
                     try {
                         callback();
                     } catch (e) {
-                        console.error(`Erro no callback de loadSection para ${id} (${url}):`, e);
+                        console.error(`Erro dentro do callback de loadSection para ${id} (${url}):`, e);
                     }
                 }
             } else {
-                console.error(`Elemento com ID '${id}' não encontrado para carregar ${url}. Verifique o HTML principal.`);
+                console.error(`Elemento com ID '${id}' não encontrado no HTML principal para carregar ${url}.`);
             }
         })
-        .catch(error => console.error(`Erro geral ao carregar a seção ${url} em #${id}:`, error));
+        .catch(error => console.error(`Erro geral ao carregar a seção ${url} para #${id}:`, error));
 }
 
 // =========================================================================
-// VARIÁVEIS GLOBAIS (DECLARADAS AQUI, INICIALIZADAS NO DOMCONTENTLOADED OU QUANDO NECESSÁRIO)
+// VARIÁVEIS GLOBAIS (Exatamente como no seu original)
 // =========================================================================
-let playerMusicaIsaacGlob, audioGlob, audioSourceGlob, progressBarGlob, tempoAtualGlob, tempoTotalGlob;
-let musicaTocandoGlob = false;
-let carrosselIntervalGlob;
-let chaveAtualSelos = 0; // Movido para global para ser acessado por navegarSelos
-let posicaoCarrosselBencaos = 0; // Movido para global
+let playerMusica, audio, audioSource, progressBar, tempoAtual, tempoTotal;
+let musicaTocando = false;
+let carrosselInterval;
+let chaveAtual = 0;
+let posicaoCarrossel = 0;
+let porcentagemAether = 101;
 
 // =========================================================================
-// DEFINIÇÕES DE FUNÇÕES GLOBAIS (para onclick no HTML)
-// Muitas dessas funções precisam acessar elementos que podem ou não estar
-// carregados ainda. Elas devem ser robustas ou os event listeners
-// devem ser adicionados dinamicamente após o carregamento do conteúdo.
+// DADOS GLOBAIS (Com caminhos relativos APLICADOS onde era 'st')
 // =========================================================================
-
-// --- BUFFY MÚSICA (SECAO-AURA) ---
-function toggleJanelaMusica() {
-    const janela = document.getElementById('janelaMusica');
-    if (janela) {
-        janela.style.display = (janela.style.display === 'none' || janela.style.display === '') ? 'block' : 'none';
-    }
-}
-
-// --- CLASSES ---
-// Renomeado de volta para `mostrarTexto` se o HTML usa `onclick="mostrarTexto()"`
-function mostrarTexto() {
-    // Assumindo que o elemento .expandido está dentro de #secao-classes
-    // Se esta seção é carregada dinamicamente, este listener deve ser adicionado no callback de loadSection
-    const expandido = document.querySelector('#secao-classes .expandido');
-    if (expandido) {
-        expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
-    } else {
-        console.warn("Classes: Elemento '.expandido' dentro de #secao-classes não encontrado!");
-    }
-}
-
-// --- CARACTERÍSTICAS (PROFISSÃO, ESTADO CIVIL) ---
-function toggleProfissao() {
-    const detalhes = document.getElementById('detalhesProfissao');
-    if (detalhes) {
-        detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
-    }
-}
-
-function abrirJanelaEstadoCivil() {
-    const janela = document.getElementById("janelaEstadoCivil");
-    const textoCasada = document.querySelector(".texto-clicavel-isaac");
-    if (janela && textoCasada) {
-        const rect = textoCasada.getBoundingClientRect();
-        janela.style.left = `${rect.right + window.scrollX + 10}px`;
-        janela.style.top = `${rect.top + window.scrollY}px`;
-        janela.style.display = "block";
-    }
-}
-
-function fecharJanelaEstadoCivil() {
-    const janela = document.getElementById("janelaEstadoCivil");
-    if (janela) janela.style.display = "none";
-}
 
 // --- PLAYER DE MÚSICA ISAAC ---
-// !! IMPORTANTE !! Mova as imagens para seu projeto e use caminhos relativos!
-const listaDeMusicasIsaac = [
-    { id: 1, nome: "Crying Alone / Nowhere", autor: "Kurae Radiânthia Pendragon Isaac",
-      capa: "assets/Imagens Isaac/sac2.jpg", // Exemplo de caminho relativo
-      background: "assets/Imagens Isaac/sac1.jpg", // Exemplo de caminho relativo
-      link: "assets/CryingAlone-Nowhere.mp3" }
+// Links para Cueinhah/Painel-de-Buffy mantidos. 'link' já era relativo.
+const listaDeMusicas = [
+    {
+        id: 1,
+        nome: "Crying Alone / Nowhere",
+        autor: "Kurae Radiânthia Pendragon Isaac",
+        capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true", // Mantido
+        background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true", // Mantido
+        link: "assets/CryingAlone-Nowhere.mp3", // Mantido relativo
+    }
 ];
-const storageKeyIsaac = 'musicasFavoritadasIsaac';
-let musicasFavoritadasIsaac = JSON.parse(localStorage.getItem(storageKeyIsaac)) || {};
-
-function togglePlayerMusicaIsaac() {
-    // Certifique-se que playerMusicaIsaacGlob foi inicializado no DOMContentLoaded
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const player = playerMusicaIsaacGlob;
-    const estadoCivil = document.getElementById('janelaEstadoCivil');
-
-    if (player) {
-        if (player.style.display === 'none' || player.style.display === '') {
-            player.style.display = 'flex';
-            if (estadoCivil) estadoCivil.style.zIndex = '900';
-            centralizarElementosPlayerIsaac();
-            if (!musicaTocandoGlob) { // Só seleciona e toca se não estiver tocando
-                 selecionarMusicaIsaac(listaDeMusicasIsaac[0].id); // Toca a primeira por padrão ou a última
-            }
-        } else {
-            player.style.display = 'none';
-            if (estadoCivil) estadoCivil.style.zIndex = '1000';
-            if (audioGlob && musicaTocandoGlob) audioGlob.pause(); // Pausa só se estiver tocando
-            // Não muda musicaTocandoGlob aqui, playPauseIsaac faz isso
-        }
-    } else {
-        console.warn("Player Isaac: Elemento '.player-musica-isaac' não encontrado para toggle.");
-    }
-}
-
-// Renomeado de volta para `fecharPlayer` se o HTML usa `onclick="fecharPlayer()"`
-function fecharPlayer() {
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const player = playerMusicaIsaacGlob;
-    const estadoCivil = document.getElementById('janelaEstadoCivil');
-
-    if (player) player.style.display = 'none';
-    if (estadoCivil) estadoCivil.style.zIndex = '1000';
-
-    if (audioGlob) {
-        audioGlob.pause();
-        musicaTocandoGlob = false; // Garante que está como pausado
-        atualizarBotaoPlayIsaac();
-    }
-}
-
-function centralizarElementosPlayerIsaac() {
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const capaMusica = playerMusicaIsaacGlob ? playerMusicaIsaacGlob.querySelector('.capa-musica-isaac') : null;
-    const player = playerMusicaIsaacGlob;
-    if (capaMusica && player) {
-        capaMusica.style.margin = 'auto';
-        player.style.display = 'flex';
-        player.style.flexDirection = 'column';
-        player.style.alignItems = 'center';
-        player.style.justifyContent = 'space-between';
-    }
-}
-
-function selecionarMusicaIsaac(id) {
-    const musicaSelecionada = listaDeMusicasIsaac.find((musica) => musica.id === id);
-    if (!audioGlob || !audioSourceGlob) {
-        console.warn("Player Isaac: Elementos de áudio não inicializados para selecionar música.");
-        return;
-    }
-    if (musicaSelecionada && playerMusicaIsaacGlob) {
-        const nomeEl = playerMusicaIsaacGlob.querySelector('.nome-musica-isaac');
-        const autorEl = playerMusicaIsaacGlob.querySelector('.autor-musica-isaac');
-        const capaImgEl = playerMusicaIsaacGlob.querySelector('.capa-musica-isaac img');
-
-        if (nomeEl) nomeEl.textContent = musicaSelecionada.nome;
-        if (autorEl) autorEl.textContent = musicaSelecionada.autor;
-        if (capaImgEl) {
-            capaImgEl.src = musicaSelecionada.capa;
-            capaImgEl.onerror = () => console.error(`Player Isaac: Erro ao carregar imagem da capa: ${musicaSelecionada.capa}`);
-        }
-        
-        playerMusicaIsaacGlob.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-        
-        audioSourceGlob.src = musicaSelecionada.link;
-        audioGlob.load(); // Important
-        // O play será acionado por playPauseIsaac ou no togglePlayerMusicaIsaac
-        // Não tocar automaticamente aqui para evitar problemas com autoplay
-        atualizarFavoritoVisualIsaac(id);
-        // Não setar musicaTocandoGlob = true aqui, o playPauseIsaac controla
-    }
-}
-
-function toggleListaMusicasIsaac() {
-    const lista = document.getElementById('listaMusicas');
-    if (lista) {
-        lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
-    }
-}
-
-function atualizarFavoritoVisualIsaac(id) {
-    // Certifique-se que o player está no DOM
-    const botaoFavoritar = document.querySelector('.player-musica-isaac .botao-favoritar-isaac');
-    if (botaoFavoritar) {
-        if (musicasFavoritadasIsaac[id]) {
-            botaoFavoritar.classList.add('favoritado');
-            botaoFavoritar.textContent = '💖';
-        } else {
-            botaoFavoritar.classList.remove('favoritado');
-            botaoFavoritar.textContent = '🤍';
-        }
-    }
-}
-
-function favoritarMusicaIsaac() {
-    const nomeMusicaAtualEl = document.querySelector('.player-musica-isaac .nome-musica-isaac');
-    if (nomeMusicaAtualEl) {
-        const musicaAtual = listaDeMusicasIsaac.find((musica) => musica.nome === nomeMusicaAtualEl.textContent);
-        if (musicaAtual) {
-            musicasFavoritadasIsaac[musicaAtual.id] = !musicasFavoritadasIsaac[musicaAtual.id];
-            if (!musicasFavoritadasIsaac[musicaAtual.id]) delete musicasFavoritadasIsaac[musicaAtual.id];
-            atualizarFavoritoVisualIsaac(musicaAtual.id);
-            localStorage.setItem(storageKeyIsaac, JSON.stringify(musicasFavoritadasIsaac));
-        }
-    }
-}
-
-function retroceder10sIsaac() {
-    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-        audioGlob.currentTime = Math.max(0, audioGlob.currentTime - 10);
-    }
-}
-
-function avancar10sIsaac() {
-    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-        audioGlob.currentTime = Math.min(audioGlob.duration, audioGlob.currentTime + 10);
-    }
-}
-
-// Renomeado de volta para `playPause` se o HTML usa `onclick="playPause()"`
-function playPause() {
-    if (!audioGlob) {
-        console.warn("Player Isaac: Elemento de áudio não encontrado para play/pause.");
-        return;
-    }
-    if (musicaTocandoGlob) {
-        audioGlob.pause();
-    } else {
-        // Se o src não estiver definido ou for inválido, o play falhará.
-        // É importante que selecionarMusicaIsaac tenha sido chamado antes.
-        if (!audioGlob.currentSrc && listaDeMusicasIsaac.length > 0) {
-            // Se não tem música carregada, carrega a primeira
-             selecionarMusicaIsaac(listaDeMusicasIsaac[0].id);
-             // O selecionarMusicaIsaac pode tentar tocar, então aguardar o oncanplaythrough
-             // Este play aqui pode ser redundante ou causar erro se o oncanplaythrough já tiver tocado
-             audioGlob.oncanplaythrough = () => { // Reatribui para o caso de ter sido perdido
-                audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada ao tentar tocar após selecionar.", error));
-                musicaTocandoGlob = true;
-                atualizarBotaoPlayIsaac();
-             }
-             return; // Sai para esperar o oncanplaythrough
-        }
-        audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada pelo navegador.", error));
-    }
-    musicaTocandoGlob = !musicaTocandoGlob; // Inverte o estado APÓS a tentativa de play/pause
-    atualizarBotaoPlayIsaac();
-}
-
-function atualizarBotaoPlayIsaac() {
-    const botaoPlay = document.querySelector('.player-musica-isaac .botao-controle-isaac:nth-child(2)');
-    if (botaoPlay) {
-        botaoPlay.textContent = musicaTocandoGlob ? 'II' : '►';
-    }
-}
-
-function formatarTempo(segundos) {
-    if (isNaN(segundos) || !isFinite(segundos) || segundos < 0) return "0:00";
-    const minutos = Math.floor(segundos / 60);
-    const restoSegundos = Math.floor(segundos % 60);
-    return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
-}
-
-function atualizarListaMusicasIsaac() {
-    const listaContainer = document.getElementById('listaMusicas');
-    if (listaContainer) {
-        listaContainer.innerHTML = '';
-        listaDeMusicasIsaac.forEach((musica) => {
-            const item = document.createElement('p');
-            item.textContent = musica.nome;
-            item.addEventListener('click', () => {
-                selecionarMusicaIsaac(musica.id);
-                if(audioGlob && !musicaTocandoGlob) { // Se não estiver tocando, tenta tocar a nova música
-                    playPause(); // Chama playPause para tentar iniciar a música
-                } else if (audioGlob && musicaTocandoGlob) { // Se já estiver tocando, força o play da nova
-                    audioGlob.play().catch(e => console.warn("Erro ao tocar música selecionada da lista:", e));
-                }
-            });
-            listaContainer.appendChild(item);
-        });
-    }
-}
-
-// --- TÍTULOS (CARROSSEL) ---
-function abrirJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) janela.style.display = 'block';
-}
-
-function fecharJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) {
-        janela.style.display = 'none';
-        // A função iniciarCarrosselTitulos será chamada pelo mouseout do container se o carrossel ainda existir
-    }
-}
-
-function expandirJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) janela.classList.toggle('janela-expandida');
-}
+const storageKey = 'musicasFavoritadas';
+let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
 
 // --- ATRIBUTOS ---
-function toggleCheckboxAtributo(element) {
-    element.classList.toggle("checked");
-}
+const atributos = {
+    hp: { total: 4910210, porcentagem: 100 }, mp: { total: 823691, porcentagem: 100 },
+    agi: { total: 637369, porcentagem: 100 }, def: { total: 1476557, porcentagem: 100 },
+    res: { total: 1331048, porcentagem: 100 }, spd: { total: 1020989, porcentagem: 100 },
+    int: { total: 431815, porcentagem: 100 }, atk: { total: 2075839, porcentagem: 100 },
+    smp: { total: 291363290, porcentagem: 99.17 }, unknown: { total: 100, porcentagem: 50 }
+};
 
 // --- SELOS ---
-const selosChavesData = [ /* Seus dados de chaves aqui, igual ao anterior */
-    { id: 0, nome: "Key of Souls", descricao: "Nenhuma informação sobre a chave Key of Souls está disponível.", item: "assets/Recursos/Key of Souls.png", efeito: "À descobrir 01.", icone: "https://imgur.com/zHQo8sh.png", detalhes: "Esta chave é um teste da alinezinha1"},
-    { id: 1, nome: "Key of Dreams", descricao: "Nenhuma informação sobre a chave Key of Dreams está disponível.", item: "assets/Recursos/Key of Dreams.png", efeito: "À descobrir 02.", icone: "https://imgur.com/lKXdgwT.png", detalhes: "Esta chave é um teste da alinezinha2"},
-    { id: 2, nome: "Key of Infinite Moon Mansion", descricao: "Nenhuma informação sobre a chave Key of Infinite Moon Mansion está disponível.", item: "assets/Recursos/Key of Infinite Moon Mansion.png", efeito: "À descobrir 03.", icone: "https://imgur.com/Hf705GX.png", detalhes: "Esta chave é um teste da alinezinha3"},
-    { id: 3, nome: "Key of Desires", descricao: "Nenhuma informação sobre a chave Key of Desires está disponível.", item: "assets/Recursos/Key of Desires.png", efeito: "À descobrir 04.", icone: "https://imgur.com/L2bLSl2.png", detalhes: "Esta chave é um teste da alinezinha4"},
-    { id: 4, nome: "Key of Soul World", descricao: "Nenhuma informação sobre a chave Key of Soul World está disponível.", item: "assets/Recursos/Key of Soul World.png", efeito: "À descobrir 05.", icone: "https://imgur.com/X1zPnlJ.png", detalhes: "Esta chave é um teste da alinezinha5"},
-    { id: 5, nome: "Key of Pendragon", descricao: "Nenhuma informação sobre a chave Key of Pendragon está disponível.", item: "assets/Recursos/Key of Pendragon.png", efeito: "À descobrir 06.", icone: "assets/Recursos/Key of Pendragon.png", detalhes: "Esta chave é um teste da alinezinha6"},
-    { id: 6, nome: "Key Pinnacle of Flames", descricao: "Nenhuma informação sobre a chave Key Pinnacle of Flames está disponível.", item: "assets/Recursos/Key Pinnacle of Flames.png", efeito: "À descobrir 07.", icone: "https://imgur.com/46Dh8W2.png", detalhes: "Esta chave é um teste da alinezinha7"},
-    { id: 7, nome: "Key of Isaac's Heart", descricao: "Nenhuma informação sobre a chave Key of Isaac's Heart está disponível.", item: "assets/Recursos/Key of Isaac's Heart.png", efeito: "À descobrir 08.", icone: "assets/Recursos/Key of Isaac's Heart.png", detalhes: "Esta chave é um teste da alinezinha8"},
+// Links para Cueinhah/Painel-de-Buffy e Imgur mantidos. 'assets/' mantidos relativos.
+const chaves = [
+    { id: 0, nome: "Key of Souls", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Souls.png?raw=true", efeito: "À descobrir 01.", icone: "https://imgur.com/zHQo8sh.png", detalhes: "..."},
+    { id: 1, nome: "Key of Dreams", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Dreams.png?raw=true", efeito: "À descobrir 02.", icone: "https://imgur.com/lKXdgwT.png", detalhes: "..."},
+    { id: 2, nome: "Key of IMM", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Infinite%20Moon%20Mansion.png?raw=true", efeito: "À descobrir 03.", icone: "https://imgur.com/Hf705GX.png", detalhes: "..."},
+    { id: 3, nome: "Key of Desires", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Desires.png?raw=true", efeito: "À descobrir 04.", icone: "https://imgur.com/L2bLSl2.png", detalhes: "..."},
+    { id: 4, nome: "Key of Soul World", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Soul%20World.png?raw=true", efeito: "À descobrir 05.", icone: "https://imgur.com/X1zPnlJ.png", detalhes: "..."},
+    { id: 5, nome: "Key of Pendragon", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Pendragon.png?raw=true", efeito: "À descobrir 06.", icone: "assets/Recursos/Key of Pendragon.png", detalhes: "..."}, // icone relativo mantido
+    { id: 6, nome: "Key PoF", descricao: "Nenhuma informação...", item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20Pinnacle%20of%20Flames.png?raw=true", efeito: "À descobrir 07.", icone: "https://imgur.com/46Dh8W2.png", detalhes: "..."},
+    { id: 7, nome: "Key Isaac H", descricao: "Nenhuma informação...", item: "assets/Recursos/Key of Isaac's Heart.png", efeito: "À descobrir 08.", icone: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Isaac's%20Heart.png?raw=true", detalhes: "..."}, // item relativo mantido
 ];
-const selosEstadosIniciais = { circulo1: true, circulo2: false, circulo3: true, circulo4: false, circulo5: true, circulo6: false, circulo7: true, circulo8: false };
-
-// Renomeado de volta para `navegar` se o HTML usa `onclick="navegar()"`
-function navegar(direcao) {
-    chaveAtualSelos = (chaveAtualSelos + direcao + selosChavesData.length) % selosChavesData.length;
-    const chave = selosChavesData[chaveAtualSelos];
-    if (!chave) return;
-
-    const tituloItemEl = document.getElementById("titulo-item");
-    const descDetalhadaEl = document.querySelector("#retangulo-item .descricao-detalhada");
-    const itemImagemEl = document.querySelector(".item-imagem img");
-    const tituloEfeitoEl = document.querySelector("#retangulo-efeitos .titulo-efeito");
-    const iconeEfeitoEl = document.querySelector("#retangulo-efeitos img");
-    const detalhesEfeitoEl = document.querySelector("#retangulo-efeitos .detalhes-detalhados");
-
-    if (tituloItemEl) tituloItemEl.textContent = chave.nome;
-    if (descDetalhadaEl) descDetalhadaEl.textContent = chave.descricao;
-    if (itemImagemEl) {
-        itemImagemEl.src = chave.item;
-        itemImagemEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do item: ${chave.item}`);
-    }
-    if (tituloEfeitoEl) tituloEfeitoEl.textContent = chave.efeito;
-    if (iconeEfeitoEl) {
-        iconeEfeitoEl.src = chave.icone;
-        iconeEfeitoEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do ícone: ${chave.icone}`);
-    }
-    if (detalhesEfeitoEl) detalhesEfeitoEl.textContent = chave.detalhes;
-    
-    atualizarDestaqueCirculoSelos(chaveAtualSelos + 1);
-}
-
-function atualizarDestaqueCirculoSelos(id) {
-    document.querySelectorAll(".circulo-pequeno").forEach((circulo, index) => {
-        circulo.style.boxShadow = (index + 1 === id) ? "0 0 10px 3px #FFD700" : "none";
-    });
-}
-function toggleCirculo1() { document.getElementById('circulo1')?.classList.toggle('ativo'); }
-// ... ( toggleCirculo2 a toggleCirculo8 da mesma forma)
-function toggleCirculo2() { document.getElementById('circulo2')?.classList.toggle('ativo'); }
-function toggleCirculo3() { document.getElementById('circulo3')?.classList.toggle('ativo'); }
-function toggleCirculo4() { document.getElementById('circulo4')?.classList.toggle('ativo'); }
-function toggleCirculo5() { document.getElementById('circulo5')?.classList.toggle('ativo'); }
-function toggleCirculo6() { document.getElementById('circulo6')?.classList.toggle('ativo'); }
-function toggleCirculo7() { document.getElementById('circulo7')?.classList.toggle('ativo'); }
-function toggleCirculo8() { document.getElementById('circulo8')?.classList.toggle('ativo'); }
-
-
-// --- BENÇÃOS E MALDIÇÕES ---
-// Renomeado de volta para `moverCarrossel` se o HTML usa `onclick="moverCarrossel()"`
-function moverCarrossel(direcao) {
-    const carrossel = document.querySelector('.carrossel-diamantes');
-    if (!carrossel) return;
-    const itens = carrossel.querySelectorAll('.diamante-item');
-    if (itens.length === 0) return;
-
-    itens.forEach(item => item.classList.remove('ativo'));
-    posicaoCarrosselBencaos = (posicaoCarrosselBencaos + direcao + itens.length) % itens.length;
-    
-    if (itens[posicaoCarrosselBencaos]) { // Verifica se o item existe
-        itens[posicaoCarrosselBencaos].classList.add('ativo');
-        const tamanhoItem = itens[posicaoCarrosselBencaos].offsetWidth + 10;
-        const scrollTarget = (posicaoCarrosselBencaos * tamanhoItem) - (carrossel.offsetWidth / 2) + (tamanhoItem / 2);
-        carrossel.scrollTo({ left: scrollTarget, behavior: 'smooth' });
-    }
-}
-// Renomeado de volta para `abrirJanela` e `fecharJanela` se o HTML usa esses nomes
-function abrirJanela(idJanela) {
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.style.display = 'block';
-}
-function fecharJanela(idJanela) {
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.style.display = 'none';
-}
-function expandirJanela(idJanela) { // Este nome estava consistente
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.classList.toggle('janela-expandida');
-}
-
-// --- FILHOS (JANELAS FLUTUANTES) ---
-function abrirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'block'; }
-function fecharJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'none'; }
-function expandirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.classList.toggle('janela-expandida'); }
-
-// --- FUNÇÃO UTILITÁRIA PARA ARRASTAR JANELAS (igual à anterior) ---
-function addDragEventsToWindow(janela) { /* ... código de addDragEventsToWindow ... */
-    let isDragging = false, startX, startY, offsetX, offsetY;
-    const dragHandle = janela.querySelector('.janela-cabecalho-arrastavel') || janela; 
-
-    dragHandle.addEventListener('mousedown', (e) => {
-        if (e.target.closest('button, input, a, .no-drag')) return;
-        isDragging = true;
-        const rect = janela.getBoundingClientRect();
-        startX = e.clientX - rect.left + janela.offsetLeft; // Ajuste para offsetLeft/Top
-        startY = e.clientY - rect.top + janela.offsetTop;  // Ajuste para offsetLeft/Top
-        janela.style.cursor = 'grabbing';
-    });
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            janela.style.left = `${e.clientX - startX + window.scrollX}px`; // Adicionado scrollX/Y
-            janela.style.top = `${e.clientY - startY + window.scrollY}px`;
-        }
-    });
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            janela.style.cursor = 'move';
-        }
-    });
-    dragHandle.style.cursor = 'move';
-}
-
+const estadosIniciais = { circulo1: true, circulo2: false, circulo3: true, circulo4: false, circulo5: true, circulo6: false, circulo7: true, circulo8: false };
 
 // =========================================================================
-// CÓDIGO QUE RODA APÓS O DOM ESTAR COMPLETAMENTE CARREGADO
+// DEFINIÇÕES DE FUNÇÕES GLOBAIS (Exatamente como no seu original)
+// =========================================================================
+// --- Buffy Música ---
+function toggleJanelaMusica() {const j=document.getElementById('janelaMusica');if(j)j.style.display=(j.style.display==='none'||j.style.display==='')?'block':'none';}
+// --- Classes ---
+function mostrarTexto() {const sC=document.getElementById('secao-classes');const exp=sC?sC.querySelector('.expandido'):document.querySelector('.expandido');if(exp)exp.style.display=(exp.style.display==='none'||exp.style.display==='')?'block':'none';else console.error("Elemento '.expandido' não encontrado!");}
+// --- Características ---
+function toggleProfissao() {const d=document.getElementById('detalhesProfissao');if(d)d.style.display=(d.style.display==='none'||d.style.display==='')?'block':'none';}
+// --- Estado Civil ---
+function abrirJanelaEstadoCivil() {const j=document.getElementById("janelaEstadoCivil");const t=document.querySelector(".texto-clicavel-isaac");if(j&&t){const r=t.getBoundingClientRect();const oX=window.pageXOffset||document.documentElement.scrollLeft;const oY=window.pageYOffset||document.documentElement.scrollTop;j.style.left=`${r.right+oX+10}px`;j.style.top=`${r.top+oY}px`;j.style.display="block";}}
+function fecharJanelaEstadoCivil() {const j=document.getElementById("janelaEstadoCivil");if(j)j.style.display="none";}
+// --- Player Isaac ---
+function togglePlayerMusicaIsaac() {const p=document.getElementById('playerMusicaIsaac');const eC=document.getElementById('janelaEstadoCivil');if(p&&eC){if(p.style.display==='none'||p.style.display===''){p.style.display='flex';eC.style.zIndex='900';centralizarElementosPlayer();if(audio&&!audio.currentSrc){selecionarMusica(1);}else if(audio&&audio.paused){playPause();}}else{p.style.display='none';eC.style.zIndex='1000';}}}
+function fecharPlayer() {const p=document.getElementById('playerMusicaIsaac');const eC=document.getElementById('janelaEstadoCivil');if(p)p.style.display='none';if(eC)eC.style.zIndex='1000';if(audio){audio.pause();/*musicaTocando=false;atualizarBotaoPlay();*/}} // Evento pause trata estado
+function centralizarElementosPlayer() {const c=document.querySelector('.capa-musica-isaac');const p=document.querySelector('.player-musica-isaac');if(c&&p){c.style.margin='auto';p.style.display='flex';p.style.flexDirection='column';p.style.alignItems='center';p.style.justifyContent='space-between';}}
+function selecionarMusica(id) {const m=listaDeMusicas.find(i=>i.id===id);if(m&&audio&&audioSource&&playerMusica){const nE=playerMusica.querySelector('.nome-musica-isaac');const aE=playerMusica.querySelector('.autor-musica-isaac');const cE=playerMusica.querySelector('.capa-musica-isaac img');const pB=playerMusica;if(nE)nE.textContent=m.nome;if(aE)aE.textContent=m.autor;if(cE){cE.src=m.capa;cE.onerror=()=>{cE.src='assets/Imagens Isaac/default_capa.png';}}if(pB)pB.style.backgroundImage=`linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.6)), url('${m.background}')`;audioSource.src=m.link;audio.load();atualizarFavoritoVisual(id);/*Não chamar play aqui*/}}
+function toggleLista() {const l=document.getElementById('listaMusicas');if(l)l.style.display=(l.style.display==='block')?'none':'block';}
+function atualizarFavoritoVisual(id){const b=document.querySelector('.botao-favoritar-isaac');if(b){if(musicasFavoritadas[id]){b.classList.add('favoritado');b.textContent='💖';}else{b.classList.remove('favoritado');b.textContent='🤍';}}}
+function favoritarMusica(){const nE=document.querySelector('.nome-musica-isaac');if(nE){const m=listaDeMusicas.find(i=>i.nome===nE.textContent);if(m){musicasFavoritadas[m.id]=!musicasFavoritadas[m.id];if(!musicasFavoritadas[m.id])delete musicasFavoritadas[m.id];atualizarFavoritoVisual(m.id);localStorage.setItem(storageKey,JSON.stringify(musicasFavoritadas));}}}
+function retroceder10s(){if(audio&&!isNaN(audio.duration)){audio.currentTime=Math.max(0,audio.currentTime-10);}}
+function avancar10s(){if(audio&&!isNaN(audio.duration)){audio.currentTime=Math.min(audio.duration,audio.currentTime+10);}}
+function playPause(){if(!audio)return;if(!audio.currentSrc&&listaDeMusicas.length>0){selecionarMusica(1);setTimeout(()=>{if(audio)audio.play().catch(e=>console.warn("Play inicial bloqueado.",e));},150);return;}if(musicaTocando){audio.pause();}else{audio.play().catch(e=>console.warn("Play bloqueado.",e));}}
+function atualizarBotaoPlay(){const b=document.querySelector('.botao-controle-isaac:nth-child(2)');if(b)b.textContent=musicaTocando?'II':'►';}
+function formatarTempo(s){if(isNaN(s)||!isFinite(s)||s<0)return"0:00";const m=Math.floor(s/60);const rS=Math.floor(s%60);return`${m}:${rS<10?'0':''}${rS}`;}
+function atualizarListaMusicas(){const lC=document.getElementById('listaMusicas');if(lC){lC.innerHTML='';listaDeMusicas.forEach((m)=>{const i=document.createElement('p');i.textContent=m.nome;i.addEventListener('click',()=>{selecionarMusica(m.id);if(audio)audio.play().catch(e=>console.warn("Play da lista bloqueado.",e));});lC.appendChild(i);});}}
+// --- Fama/Moral ---
+function atualizarBarra(idB,idT,p,idS=null){const b=document.getElementById(idB);const t=document.getElementById(idT);if(b&&t){b.style.width=`${p}%`;t.textContent=`${p}%`;let c;if(p<=20)c='darkred';else if(p<=40)c='#FF9100';else if(p<=60)c='#00D19A';else if(p<=80)c='#D622EF';else c='#6222EF';b.style.backgroundColor=c;if(idS){const sE=document.getElementById(idS);if(sE){let tS;if(p<=20)tS='Infame..';else if(p<=40)tS='Desprezado..';else if(p<=60)tS='Ambíguo..';else if(p<=80)tS='Respeitado..';else tS='Renomado..';sE.textContent=tS;}}}}
+// --- Títulos ---
+function iniciarCarrossel(){const c=document.querySelector('.carrossel-imagens');const cC=document.querySelector('.carrossel-titulos');if(!c||!cC)return;clearInterval(carrosselInterval);carrosselInterval=setInterval(()=>{if(!c){clearInterval(carrosselInterval);return;}c.scrollLeft+=1;if(c.scrollLeft>=c.scrollWidth-c.offsetWidth){c.scrollLeft=0;}},30);}
+function pausarCarrossel(){clearInterval(carrosselInterval);}
+function abrirJanelaTitulo(id){pausarCarrossel();const j=document.getElementById(`janelaTitulo${id}`);if(j)j.style.display='block';}
+function fecharJanelaTitulo(id){const j=document.getElementById(`janelaTitulo${id}`);if(j){j.style.display='none';iniciarCarrossel();}}
+function expandirJanelaTitulo(id){const j=document.getElementById(`janelaTitulo${id}`);if(j)j.classList.toggle('janela-expandida');}
+// --- Atributos ---
+function toggleCheckbox(e){e.classList.toggle("checked");}
+function atualizarAtributoAtual(a,t,p){const vA=Math.floor((p/100)*t);const tE=document.getElementById(`texto-${a}`);const bE=document.getElementById(`barra-${a}`);if(tE)tE.innerText=`${vA} / ${t}`;if(bE)bE.style.width=`${p}%`;}
+// --- Selos ---
+function navegar(dOI){if(typeof dOI==='number'&&dOI>=0&&dOI<chaves.length){chaveAtual=dOI;}else if(typeof dOI==='number'){chaveAtual=(chaveAtual+dOI+chaves.length)%chaves.length;}else{return;}const c=chaves[chaveAtual];if(!c)return;const tI=document.getElementById("titulo-item");const dD=document.querySelector("#retangulo-item .descricao-detalhada");const iI=document.querySelector("#retangulo-item .item-imagem img");const tE=document.querySelector("#retangulo-efeitos .titulo-efeito");const iE=document.querySelector("#retangulo-efeitos img");const dE=document.querySelector("#retangulo-efeitos .detalhes-detalhados");if(tI)tI.textContent=c.nome;if(dD)dD.textContent=c.descricao;if(iI){iI.src=c.item;iI.onerror=()=>{iI.src='assets/Recursos/default_key.png';}}if(tE)tE.textContent=c.efeito;if(iE){iE.src=c.icone;iE.onerror=()=>{iE.src='assets/Recursos/default_icon.png';}}if(dE)dE.textContent=c.detalhes;atualizarDestaqueCirculo(chaveAtual+1);}
+function atualizarDestaqueCirculo(id){document.querySelectorAll(".circulo-pequeno").forEach((c,i)=>{c.style.boxShadow=(i+1===id)?"0 0 10px 3px #FFD700":"none";});}
+function toggleCirculo1(){toggleEstado('circulo1');} function toggleCirculo2(){toggleEstado('circulo2');} function toggleCirculo3(){toggleEstado('circulo3');} function toggleCirculo4(){toggleEstado('circulo4');} function toggleCirculo5(){toggleEstado('circulo5');} function toggleCirculo6(){toggleEstado('circulo6');} function toggleCirculo7(){toggleEstado('circulo7');} function toggleCirculo8(){toggleEstado('circulo8');}
+function toggleEstado(id){const c=document.getElementById(id);if(c)c.classList.toggle('ativo');}
+function ativarChave(){const c=chaves[chaveAtual];if(c)alert(`Ativando: ${c.nome}`);}
+// --- Bençãos/Maldições ---
+function moverCarrossel(d){const c=document.querySelector('.carrossel-diamantes');if(!c)return;const i=c.querySelectorAll('.diamante-item');if(i.length===0)return;i.forEach(item=>item.classList.remove('ativo'));posicaoCarrossel=(posicaoCarrossel+d+i.length)%i.length;if(i[posicaoCarrossel]){i[posicaoCarrossel].classList.add('ativo');const t=i[posicaoCarrossel].offsetWidth+10;const sT=(posicaoCarrossel*t)-(c.offsetWidth/2)+(t/2);c.scrollTo({left:sT,behavior:'smooth'});}}
+// --- Barra EA ---
+function atualizarEA(p){const b=document.getElementById('preenchimento-ea');const t=document.getElementById('texto-ea');if(b&&t){p=Math.max(0,Math.min(100,p));b.style.width=`${p}%`;t.textContent=`EA: ${p}%`;}}
+// --- Filhos ---
+function abrirJanelaFilho(id){abrirJanela(`janelaFilho${id}`);}
+function fecharJanelaFilho(id){fecharJanela(`janelaFilho${id}`);}
+function expandirJanelaFilho(id){expandirJanela(`janelaFilho${id}`);}
+// --- Necessidades ---
+function atualizarStatusBasicas(gId,p){const f=document.getElementById(`barra-progresso-${gId}`);const t=document.getElementById(`progresso-texto-${gId}`);const s=document.getElementById(`estado-${gId}`);if(f&&t&&s){f.style.width=`${p}%`;t.textContent=`${p}%`;let c='',st='';if(p<=0){c='#00B59B';st='Nulo';}else if(p<=5){c='darkred';st='Crítico';}else if(p<=30){c='red';st='Baixo';}else if(p<=60){c='#FFAA00';st='Moderado';}else if(p<=95){c='green';st='Bom';}else if(p<=100){c='#00B59B';st='Excelente';}else{c='#6222EF';st='Insano';}f.style.backgroundColor=c;s.textContent=st;}}
+function atualizarStatusTemporarias(gId,p){const f=document.getElementById(`barra-progresso-${gId}`);const t=document.getElementById(`progresso-texto-${gId}`);const s=document.getElementById(`estado-${gId}`);if(f&&t&&s){f.style.width=`${p}%`;t.textContent=`${p}%`;let c='',st='';if(p<=0){c='#00B59B';st='Nulo';}else if(p<=5){c='#00B59B';st='Muito Baixo';}else if(p<=30){c='green';st='Baixo';}else if(p<=60){c='#FFAA00';st='Moderado';}else if(p<=95){c='red';st='Alto';}else{c='darkred';st='Crítico';}f.style.backgroundColor=c;s.textContent=st;}}
+// --- Aether ---
+function atualizarAether(p){if(p>102)p=102;if(p<0)p=0;const pa=document.getElementById("preenchimentoAether");const ta=document.getElementById("textoAether");if(pa)pa.style.width=`${(p/102)*100}%`;if(ta)ta.textContent=`Aether: ${p}%`;}
+// --- Drag and Drop ---
+function addDragEventsToWindow(j){let iD=false,dX,dY,iL,iT;const dH=j.querySelector('.janela-cabecalho-arrastavel')||j.querySelector('.janela-botoes')||j;if(!dH)return;dH.addEventListener('mousedown',(e)=>{if(e.target.closest('button,input,a,.no-drag'))return;iD=true;dX=e.clientX;dY=e.clientY;iL=j.offsetLeft;iT=j.offsetTop;j.style.cursor='grabbing';j.style.userSelect='none';});document.addEventListener('mousemove',(e)=>{if(iD){e.preventDefault();const dX_=e.clientX-dX;const dY_=e.clientY-dY;j.style.left=`${iL+dX_}px`;j.style.top=`${iT+dY_}px`;}});document.addEventListener('mouseup',()=>{if(iD){iD=false;j.style.cursor='move';j.style.userSelect='';}});dH.style.cursor='move';j.classList.add('janela-arrastavel');}
+
+// =========================================================================
+// CÓDIGO EXECUTADO QUANDO O DOM ESTÁ PRONTO (DOMContentLoaded)
 // =========================================================================
 document.addEventListener("DOMContentLoaded", function () {
 
-    // --- INICIALIZAÇÃO PLAYER DE MÚSICA ISAAC ---
-    playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    audioGlob = document.querySelector('#audio-player');
-    audioSourceGlob = audioGlob ? audioGlob.querySelector('source') : null;
-    progressBarGlob = document.getElementById('progress-bar');
-    tempoAtualGlob = document.getElementById('tempo-atual');
-    tempoTotalGlob = document.getElementById('tempo-total');
+    // --- Inicializa Player Isaac ---
+    playerMusica = document.querySelector('.player-musica-isaac'); // Atribui à variável global original
+    if (playerMusica) {
+        audio = playerMusica.querySelector('#audio-player');       // Atribui à variável global original
+        if (audio) {
+            audioSource = audio.querySelector('source');             // Atribui à variável global original
+            // Adiciona listeners de eventos ao áudio
+            audio.addEventListener('timeupdate',()=>{if(tempoAtual&&!isNaN(audio.currentTime))tempoAtual.textContent=formatarTempo(audio.currentTime);if(progressBar&&audio.duration&&!isNaN(audio.duration)&&audio.duration>0)progressBar.value=(audio.currentTime/audio.duration)*100;});
+            audio.addEventListener('loadedmetadata',()=>{if(tempoTotal&&!isNaN(audio.duration)&&audio.duration>0)tempoTotal.textContent=formatarTempo(audio.duration);else if(tempoTotal)tempoTotal.textContent="0:00";});
+            audio.addEventListener('ended',()=>{musicaTocando=false;atualizarBotaoPlay();});
+            audio.addEventListener('play',()=>{musicaTocando=true;atualizarBotaoPlay();});
+            audio.addEventListener('pause',()=>{musicaTocando=false;atualizarBotaoPlay();});
+        }
+        progressBar = playerMusica.querySelector('#progress-bar'); // Atribui à variável global original
+        tempoAtual = playerMusica.querySelector('#tempo-atual');   // Atribui à variável global original
+        tempoTotal = playerMusica.querySelector('#tempo-total');   // Atribui à variável global original
 
-    // Adicionar listeners aos botões do player Isaac se eles existem no DOM principal
-    const btnFavoritarIsaac = document.querySelector(".player-musica-isaac .botao-favoritar-isaac");
-    if (btnFavoritarIsaac) {
-        btnFavoritarIsaac.addEventListener("click", favoritarMusicaIsaac);
-    } else {
-        console.warn("Player Isaac: Botão '.botao-favoritar-isaac' não encontrado no DOMContentLoaded.");
-    }
+        if (progressBar && audio) { progressBar.addEventListener('input',()=>{if(audio&&!isNaN(audio.duration)&&isFinite(audio.duration)&&audio.duration>0){audio.currentTime=(progressBar.value/100)*audio.duration;}}); }
 
-    const btnListaMusicasIsaac = document.querySelector(".player-musica-isaac .botao-lista-musicas");
-    if (btnListaMusicasIsaac) {
-        btnListaMusicasIsaac.addEventListener("click", toggleListaMusicasIsaac);
-    } else {
-        console.warn("Player Isaac: Botão '.botao-lista-musicas' não encontrado no DOMContentLoaded (ou precisa de seletor mais específico se dentro do player).");
-    }
+        // Listeners dos botões Favoritar e Lista (como no original)
+        const favButton = playerMusica.querySelector(".botao-favoritar-isaac");
+        const listButton = playerMusica.querySelector(".botao-lista-musicas");
+        if(favButton) favButton.addEventListener("click", favoritarMusica);
+        if(listButton) listButton.addEventListener("click", toggleLista);
 
-    if (progressBarGlob && audioGlob) {
-        progressBarGlob.addEventListener('input', () => {
-            if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-                audioGlob.currentTime = (progressBarGlob.value / 100) * audioGlob.duration;
-            }
-        });
-    }
-
-    if (audioGlob) {
-        audioGlob.addEventListener('timeupdate', () => {
-            if (tempoAtualGlob && !isNaN(audioGlob.currentTime)) tempoAtualGlob.textContent = formatarTempo(audioGlob.currentTime);
-            if (progressBarGlob && audioGlob.duration && !isNaN(audioGlob.duration)) progressBarGlob.value = (audioGlob.currentTime / audioGlob.duration) * 100;
-        });
-        audioGlob.addEventListener('loadedmetadata', () => {
-            if (tempoTotalGlob && !isNaN(audioGlob.duration)) tempoTotalGlob.textContent = formatarTempo(audioGlob.duration);
-        });
-        audioGlob.addEventListener('ended', () => {
-            musicaTocandoGlob = false;
-            atualizarBotaoPlayIsaac();
-            // Opcional: tocar a próxima música
-        });
-         audioGlob.addEventListener('play', () => { // Quando o áudio realmente começa a tocar
-            musicaTocandoGlob = true;
-            atualizarBotaoPlayIsaac();
-        });
-        audioGlob.addEventListener('pause', () => { // Quando o áudio é pausado
-            musicaTocandoGlob = false;
-            atualizarBotaoPlayIsaac();
-        });
-    }
-
-    // Carregar lista e (mas não selecionar/tocar) músicas do Player Isaac
-    // A seleção/play acontece com togglePlayerMusicaIsaac ou playPause
-    if (document.getElementById('listaMusicas')) {
-        atualizarListaMusicasIsaac();
-        document.getElementById('listaMusicas').style.display = 'none';
-        if (playerMusicaIsaacGlob) atualizarBotaoPlayIsaac(); // Atualiza o botão para o estado inicial
-    }
-
-    // --- FAMA/MORAL E AUTOESTIMA (Funções de atualização chamadas diretamente abaixo) ---
-    function atualizarBarraStatus(idBarra, idTexto, porcentagem, idStatus = null) { /* ...código da função... */
-        const barra = document.getElementById(idBarra);
-        const texto = document.getElementById(idTexto);
-        if (barra && texto) {
-            barra.style.width = `${porcentagem}%`;
-            texto.textContent = `${porcentagem}%`;
-            let cor;
-            if (porcentagem <= 20) cor = 'darkred'; else if (porcentagem <= 40) cor = '#FF9100';
-            else if (porcentagem <= 60) cor = '#00D19A'; else if (porcentagem <= 80) cor = '#D622EF';
-            else cor = '#6222EF';
-            barra.style.backgroundColor = cor;
-            if (idStatus) {
-                const statusEl = document.getElementById(idStatus);
-                if (statusEl) {
-                    let textoStatus;
-                    if (porcentagem <= 20) textoStatus = 'Infame - Condenado - Vilão - Corrupto';
-                    else if (porcentagem <= 40) textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
-                    else if (porcentagem <= 60) textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
-                    else if (porcentagem <= 80) textoStatus = 'Respeitado - Admirado - Herói - Protetor';
-                    else textoStatus = 'Renomado - Lendário - Venerado - Salvador';
-                    statusEl.textContent = textoStatus;
-                }
-            }
+        // Carrega lista de músicas e atualiza estado inicial
+        if (document.getElementById('listaMusicas')) {
+            atualizarListaMusicas();
+            // selecionarMusica(1); // REMOVIDO para não tocar automaticamente
+            document.getElementById('listaMusicas').style.display = 'none';
+            atualizarBotaoPlay();
         }
     }
-    atualizarBarraStatus('barra-autoestima', 'texto-autoestima', 98);
-    atualizarBarraStatus('barra-fama', 'texto-fama', 97, 'status-fama');
 
-    // --- CARROSSEL DE TÍTULOS ---
-    const carrosselTitulosEl = document.querySelector('.carrossel-titulos .carrossel-imagens');
-    const carrosselContainerTitulosEl = document.querySelector('.carrossel-titulos');
-    function iniciarCarrosselTitulos() { /* ...código da função... */
-        if (!carrosselTitulosEl) return; clearInterval(carrosselIntervalGlob);
-        carrosselIntervalGlob = setInterval(() => {
-            carrosselTitulosEl.scrollLeft += 1;
-            if (carrosselTitulosEl.scrollLeft >= carrosselTitulosEl.scrollWidth - carrosselTitulosEl.offsetWidth -1) carrosselTitulosEl.scrollLeft = 0;
-        }, 30);
+    // --- Atualiza Barras Status (Fama/Autoestima) ---
+    atualizarBarra('barra-autoestima', 'texto-autoestima', 98);
+    atualizarBarra('barra-fama', 'texto-fama', 97, 'status-fama');
+
+    // --- Configura Carrossel Títulos ---
+    const carrosselContainer = document.querySelector('.carrossel-titulos'); // Variável local com nome original
+    if(carrosselContainer){
+        const carrossel = carrosselContainer.querySelector('.carrossel-imagens'); // Variável local com nome original
+        if(carrossel) {
+             // Atribui às funções globais para referência externa, se necessário
+             pausarCarrosselFunc = pausarCarrossel; iniciarCarrosselFunc = iniciarCarrossel;
+             iniciarCarrossel(); // Inicia o carrossel
+             carrosselContainer.addEventListener('mouseover', pausarCarrossel);
+             carrosselContainer.addEventListener('mouseout', iniciarCarrossel);
+        }
+        // Gerenciar cliques (como no original - mas já tratado pelo onclick?)
+         // Removido o querySelectorAll e listener daqui para evitar duplicidade com onclick
     }
-    function pausarCarrosselTitulos() { clearInterval(carrosselIntervalGlob); }
+    document.querySelectorAll('.janela-titulos').forEach(addDragEventsToWindow); // Tornar janelas arrastáveis
 
-    if (carrosselTitulosEl && carrosselContainerTitulosEl) {
-        iniciarCarrosselTitulos();
-        carrosselContainerTitulosEl.addEventListener('mouseover', pausarCarrosselTitulos);
-        carrosselContainerTitulosEl.addEventListener('mouseout', iniciarCarrosselTitulos);
-        // Listeners para .titulo-item são adicionados via onclick no HTML, chamando abrirJanelaTitulo(id)
-    }
-    document.querySelectorAll('.janela-titulos').forEach(addDragEventsToWindow);
-
-
-    // --- ATRIBUTOS ---
-    const atributosData = { /* ...seus dados... */
-        hp: { total: 4910210, porcentagem: 100 }, mp: { total: 823691, porcentagem: 100 },
-        agi: { total: 637369, porcentagem: 100 }, def: { total: 1476557, porcentagem: 100 },
-        res: { total: 1331048, porcentagem: 100 }, spd: { total: 1020989, porcentagem: 100 },
-        int: { total: 431815, porcentagem: 100 }, atk: { total: 2075839, porcentagem: 100 },
-        smp: { total: 291363290, porcentagem: 99.17 }, unknown: { total: 100, porcentagem: 50 }
-    };
-    function atualizarAtributoAtual(atributo, total, porcentagem) { /* ...código da função... */
-        const textoEl = document.getElementById(`texto-${atributo}`);
-        const barraEl = document.getElementById(`barra-${atributo}`);
-        if (textoEl && barraEl) {
-            const valorAtual = Math.floor((porcentagem / 100) * total);
-            textoEl.innerText = `${valorAtual} / ${total}`;
-            barraEl.style.width = `${porcentagem}%`;
+    // --- Atualiza Atributos ---
+    for (let atributoKey in atributos) { // Usando nome original
+        if (Object.hasOwnProperty.call(atributos, atributoKey)) {
+            atualizarAtributoAtual(atributoKey, atributos[atributoKey].total, atributos[atributoKey].porcentagem);
         }
     }
-    for (let atributo in atributosData) {
-        atualizarAtributoAtual(atributo, atributosData[atributo].total, atributosData[atributo].porcentagem);
-    }
 
-    // --- SELOS ---
-    for (const [id, ativo] of Object.entries(selosEstadosIniciais)) {
+    // --- Inicializa Selos ---
+    for (const [id, ativo] of Object.entries(estadosIniciais)) { // Usando nome original
         const circulo = document.getElementById(id);
         if (circulo) { if (ativo) circulo.classList.add('ativo'); else circulo.classList.remove('ativo'); }
     }
-    document.querySelectorAll("#retangulo-item .titulo-item, #retangulo-efeitos .titulo-efeito, #retangulo-item .descricao-detalhada")
-        .forEach(el => el.contentEditable = "false");
-    if (document.getElementById("titulo-item")) { // Verifica se o container dos selos existe
-         navegar(0); // Chama a função global `navegar`
-    }
+    document.querySelectorAll(".titulo-item, .titulo-efeito, .descricao-detalhada, .detalhes-detalhados").forEach(elemento => { // Seletores originais
+         if(elemento) elemento.contentEditable = "false";
+    });
+    if(document.getElementById("titulo-item")) { navegar(0); } // Inicializa display dos selos
 
-    // --- BENÇÃOS E MALDIÇÕES ---
-    const diamantesCarrossel = document.querySelectorAll('.diamante-item');
-    if (diamantesCarrossel.length > 0) {
-        const meio = Math.floor(diamantesCarrossel.length / 2);
-        if (diamantesCarrossel[meio]) diamantesCarrossel[meio].classList.add('ativo');
-        moverCarrossel(0); // Chama a função global `moverCarrossel`
+    // --- Inicializa Carrossel Bênçãos ---
+    const diamantes = document.querySelectorAll('.diamante-item'); // Nome original
+    if (diamantes.length > 0) {
+        posicaoCarrossel = Math.floor(diamantes.length / 2); // Nome original
+        if(diamantes[posicaoCarrossel]) diamantes[posicaoCarrossel].classList.add('ativo');
+        moverCarrossel(0); // Ajusta scroll inicial
     }
     document.querySelectorAll('.janela-bencao').forEach(addDragEventsToWindow);
 
-    // --- BARRA EA ---
-    function atualizarEA(porcentagem) { /* ...código da função... */
-        const barraEA = document.getElementById('preenchimento-ea');
-        const textoEA = document.getElementById('texto-ea');
-        if (barraEA && textoEA) {
-            porcentagem = Math.max(0, Math.min(100, porcentagem));
-            barraEA.style.width = `${porcentagem}%`;
-            textoEA.textContent = `EA: ${porcentagem}%`;
-        }
-    }
+    // --- Atualiza Barra EA ---
     atualizarEA(86);
 
-    // --- NECESSIDADES BÁSICAS E TEMPORÁRIAS ---
-    function atualizarStatusBasicas(grupoId, porcentagem) { /* ...código da função... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
-        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
-        const statusIndicator = document.getElementById(`estado-${grupoId}`);
-        if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
-            let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
-            else if (porcentagem <= 5) { color = 'darkred'; status = 'Crítico'; } else if (porcentagem <= 30) { color = 'red'; status = 'Baixo'; }
-            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'green'; status = 'Bom'; }
-            else if (porcentagem <= 100) { color = '#00B59B'; status = 'Excelente'; } else { color = '#6222EF'; status = 'Insano'; }
-            fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
-        }
-    }
-    function atualizarStatusTemporarias(grupoId, porcentagem) { /* ...código da função... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
-        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
-        const statusIndicator = document.getElementById(`estado-${grupoId}`);
-        if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
-            let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
-            else if (porcentagem <= 5) { color = '#00B59B'; status = 'Muito Baixo'; } else if (porcentagem <= 30) { color = 'green'; status = 'Baixo'; }
-            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'red'; status = 'Alto'; }
-            else { color = 'darkred'; status = 'Crítico'; }
-            fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
-        }
-    }
-    // Chamadas de atualização... (iguais)
-    atualizarStatusBasicas('grupo-higiene', 97); /* ... etc ... */
-    atualizarStatusBasicas('grupo-banheiro', 100); atualizarStatusBasicas('grupo-sono', 100); atualizarStatusBasicas('grupo-fome', 100);
-    atualizarStatusBasicas('grupo-sede', 100); atualizarStatusBasicas('grupo-diversao', 101); atualizarStatusBasicas('grupo-social', 78);
-    atualizarStatusBasicas('grupo-foco', 64); atualizarStatusBasicas('grupo-felicidade', 101); atualizarStatusBasicas('grupo-tesao', 101);
-    atualizarStatusTemporarias('grupo-enjoo', 0); /* ... etc ... */
-    atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0); atualizarStatusTemporarias('grupo-ansiedade', 0);
-    atualizarStatusTemporarias('grupo-medo', 0); atualizarStatusTemporarias('grupo-tedio', 0); atualizarStatusTemporarias('grupo-raiva', 0);
-    atualizarStatusTemporarias('grupo-desgaste', 0);
-    
-    // --- AETHER ---
-    function atualizarAether(porcentagem) { /* ...código da função... */
-        const preenchimentoAether = document.getElementById("preenchimentoAether");
-        const textoAether = document.getElementById("textoAether");
-        if (preenchimentoAether && textoAether) {
-            porcentagem = Math.max(0, Math.min(102, porcentagem));
-            preenchimentoAether.style.width = `${(porcentagem / 102) * 100}%`;
-            textoAether.textContent = `Aether: ${porcentagem}%`;
-        }
-    }
-    atualizarAether(101);
+    // --- Atualiza Necessidades ---
+    atualizarStatusBasicas('grupo-higiene', 97); atualizarStatusBasicas('grupo-banheiro', 100); atualizarStatusBasicas('grupo-sono', 100);
+    atualizarStatusBasicas('grupo-fome', 100); atualizarStatusBasicas('grupo-sede', 100); atualizarStatusBasicas('grupo-diversao', 101);
+    atualizarStatusBasicas('grupo-social', 78); atualizarStatusBasicas('grupo-foco', 64);
+    atualizarStatusBasicas('grupo-felicidade', 101); atualizarStatusBasicas('grupo-tesao', 101);
+    atualizarStatusBasicas('grupo-desgaste', 0); // Presumindo valor 0 se não especificado
+    atualizarStatusTemporarias('grupo-enjoo', 0); atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0);
+    atualizarStatusTemporarias('grupo-ansiedade', 0); atualizarStatusTemporarias('grupo-medo', 0);
+    atualizarStatusTemporarias('grupo-tedio', 0); atualizarStatusTemporarias('grupo-raiva', 0);
+    // grupo-desgaste não existe em temporárias no HTML
 
-    document.querySelectorAll('.janela-filho').forEach(addDragEventsToWindow);
+    // --- Atualiza Aether ---
+    atualizarAether(porcentagemAether);
 
+    // --- Adiciona Drag às Janelas Restantes ---
+    document.querySelectorAll('.janela-filhos, #janelaEstadoCivil').forEach(addDragEventsToWindow);
 
-    // =========================================================================
-    // CARREGAMENTO DAS SEÇÕES DINÂMICAS (HTML EXTERNO)
-    // =========================================================================
-    loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
-        const playerMusicaBuffy = document.querySelector("#janelaMusica iframe");
-        if (playerMusicaBuffy) {
-            playerMusicaBuffy.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
-        } else {
-            console.warn("Buffy Música: #janelaMusica iframe não encontrado APÓS carregar secao-aura.");
-        }
-    });
-
+    // --- Carrega as seções dinâmicas ---
+    // (O código de loadSection já está no topo, as chamadas estão abaixo)
+    loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function(){const p=document.querySelector("#secao-aura #janelaMusica iframe");if(p)p.src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";});
     loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html");
-
-    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
-        console.log("Seção Cabeçalho carregada!");
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
+    loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function(){setTimeout(()=>{var p=document.querySelector('#secao-bahdinheiro #expBar');if(p){var pct=75;p.style.width=pct+'%';const c=p.closest('.barra-exp-container');if(c){const t=c.querySelector('.barra-texto');if(t)t.textContent='1590 - '+pct+'%';}}},500);});
+    loadSection("secao-classes", "Seções/5-Classes.html");
+    // Callbacks para Modo Empusa e Alvo com funções locais e dados originais
+    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function(){
+        function aBL(iB,iT,p){var pb=document.querySelector(`#secao-modoempusa #${iB}`);var ts=document.querySelector(`#secao-modoempusa #${iT}`);if(pb&&ts){pb.style.width=p+'%';ts.textContent=p+'%';}}
+        function aFL(){const s=document.querySelector("#secao-modoempusa #sangue-texto");const v=document.querySelector("#secao-modoempusa #vitalidade-texto");if(s&&v){var sg=parseInt(s.textContent)||0;var vt=parseInt(v.textContent)||0;var ft=Math.min(sg+vt,100);aBL("fomeBar","fome-texto",ft);}}
+        function tML(st){var m=st.parentElement.nextElementSibling;if(m&&m.classList.contains('empusa-menu')){document.querySelectorAll('#secao-modoempusa .empusa-menu').forEach(i=>{if(i!==m)i.style.display='none';});m.style.display=(m.style.display==='block')?'none':'block';}}
+        function aDL(nD){nD=Math.max(0,Math.min(nD,6));for(let i=1;i<=6;i++){let c=document.querySelector(`#secao-modoempusa #coracao-${i}`);if(c)c.textContent=(i<=nD)?"💜":"🤍";}}
+        function aSL(iC,iP,nS){nS=Math.max(1,Math.min(nS,6));let cont=document.querySelector(`#secao-modoempusa #${iC}`);if(!cont)return;cont.querySelectorAll('.emoji-satisfacao').forEach(e=>e.classList.remove('emoji-selecionado'));let emS=document.querySelector(`#secao-modoempusa #${iP}-${nS}`);if(emS)emS.classList.add('emoji-selecionado');}
+        setTimeout(()=>{aBL("prazerBar","prazer-texto",99);aBL("amorBar","amor-texto",100);aBL("sangueBar","sangue-texto",47);aBL("vitalidadeBar","vitalidade-texto",100);aFL();aDL(1);aSL("satisfacao-container","satisfacao",5);document.querySelectorAll('#secao-modoempusa .empusa-seta').forEach(s=>{s.addEventListener('click',function(){tML(this);});});},500);
+    });
+    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function(){
+        function aBAL(iB,iT,p){var pb=document.querySelector(`#secao-modoempusa-alvo #${iB}`);var ts=document.querySelector(`#secao-modoempusa-alvo #${iT}`);if(pb&&ts){pb.style.width=p+'%';ts.textContent=p+'%';}}
+        function aDAL(nD){nD=Math.max(0,Math.min(nD,6));for(let i=1;i<=6;i++){let c=document.querySelector(`#secao-modoempusa-alvo #coracao-alvo-${i}`);if(c)c.textContent=i<=nD?"💜":"🤍";}}
+        function aSAL(iC,iP,nS){nS=Math.max(1,Math.min(nS,6));let cont=document.querySelector(`#secao-modoempusa-alvo #${iC}`);if(!cont)return;cont.querySelectorAll('.emoji-satisfacao').forEach(e=>e.classList.remove('emoji-selecionado'));let emS=document.querySelector(`#secao-modoempusa-alvo #${iP}-${nS}`);if(emS)emS.classList.add('emoji-selecionado');}
+        function aDoL(p){p=Math.max(0,Math.min(p,100));let pre=document.querySelector("#secao-modoempusa-alvo #dominanciaBar");let emo=document.querySelector("#secao-modoempusa-alvo #dominancia-emoji");if(pre&&emo){pre.style.background=`linear-gradient(to right,#ff12a9 0%,#ff12a9 ${Math.max(0,p-5)}%,#a020f0 ${p}%,#1e90ff ${Math.min(100,p+5)}%,#1e90ff 100%)`;emo.style.left=`calc(${p}% - 15px)`;}}
+        setTimeout(()=>{aBAL("prazerBarAlvo","prazer-texto-alvo",98);aBAL("amorBarAlvo","amor-texto-alvo",100);aBAL("volumeBarAlvo","volume-texto-alvo",5);aBAL("vitalidadeBarAlvo","vitalide-texto-alvo",21);aDAL(3);aSAL("satisfacao-container-alvo","satisfacao-alvo",5);aDoL(73);},500);
     });
 
-    loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
-        console.log("Seção Barra de Experiência carregada!");
-        // O erro era aqui: progressBar.closest(...).querySelector(...)
-        // Vamos garantir que progressBar exista e o seletor seja direto.
-        setTimeout(() => {
-            var progressBar = document.getElementById('expBar');
-            if (progressBar) {
-                var percentage = 75;
-                progressBar.style.width = percentage + '%';
-                // Assumindo que .barra-texto é um irmão ou filho direto do container da barra
-                // Se .barra-texto está DENTRO de #expBar, então progressBar.querySelector('.barra-texto')
-                // Se é um irmão, precisa de um seletor a partir de um pai comum.
-                // Se o HTML for <div class="container"><div id="expBar"></div><span class="barra-texto"></span></div>
-                // Então:
-                const containerDaBarra = progressBar.closest('.barra-exp-container'); // Ou qualquer que seja o container
-                if (containerDaBarra) {
-                    const textSpan = containerDaBarra.querySelector('.barra-texto');
-                    if (textSpan) {
-                        textSpan.textContent = '1590 - ' + percentage + '%';
-                    } else {
-                        console.warn("Barra Dinheiro: '.barra-texto' não encontrado dentro do container de 'expBar'.");
-                    }
-                } else {
-                     console.warn("Barra Dinheiro: Container de 'expBar' não encontrado.");
-                }
-            } else {
-                console.warn("Barra Dinheiro: Elemento 'expBar' não encontrado após carregar seção.");
-            }
-        }, 500);
-    });
-
-    loadSection("secao-classes", "Seções/5-Classes.html", function () {
-        console.log("Seção Classes carregada!");
-        // Se o botão que chama `mostrarTexto()` está DENTRO desta seção,
-        // o listener deveria ser adicionado aqui, ex:
-        // const botaoMostrarTexto = document.querySelector('#secao-classes .botao-que-mostra-texto');
-        // if (botaoMostrarTexto) botaoMostrarTexto.addEventListener('click', mostrarTexto);
-        // Se o onclick no HTML já está funcionando com a função global `mostrarTexto`, ok.
-    });
-
-    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function () {
-        console.log("Seção Modo Empusa carregada!");
-        // Funções de atualização do Modo Empusa (definidas globalmente ou dentro deste callback)
-        function atualizarBarraModoEmpusa(idBarra, idTexto, porcentagem) { /* ... */ }
-        function atualizarFomeModoEmpusa() { /* ... */ }
-        function toggleMenuModoEmpusa(seta) { /* ... */ }
-        function atualizarDorModoEmpusa(nivelDor) { /* ... */ }
-        function atualizarSatisfacaoModoEmpusa(idContainer, idPrefixo, nivelSatisfacao) { /* ... */ }
-        // Copie as definições das funções do Modo Empusa para cá se elas usam elementos SÓ desta seção
-
-        setTimeout(() => {
-            // Chamadas de atualização... (ex: atualizarBarraModoEmpusa(...))
-            // Adicionar listener para .empusa-seta
-            document.querySelectorAll('#secao-modoempusa .empusa-seta').forEach(seta => { // Seletor específico
-                seta.addEventListener('click', function () {
-                    // Precisa da definição de toggleMenuModoEmpusa acessível aqui
-                    var menu = this.parentElement.nextElementSibling;
-                    if (menu && menu.classList.contains('empusa-menu')) {
-                        document.querySelectorAll('#secao-modoempusa .empusa-menu').forEach(m => {
-                            if (m !== menu) m.style.display = 'none';
-                        });
-                        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-                    }
-                });
-            });
-        }, 500);
-    });
-
-    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function () {
-        console.log("Seção Modo Empusa - Alvo carregada!");
-        // Funções de atualização do Modo Empusa Alvo (definidas globalmente ou dentro deste callback)
-        function atualizarBarraModoEmpusaAlvo(idBarra, idTexto, porcentagem) { /* ... */ }
-        function atualizarDorModoEmpusaAlvo(nivelDor) { /* ... */ }
-        function atualizarDominanciaModoEmpusaAlvo(porcentagem) { /* ... */ }
-        // Copie as definições das funções do Modo Empusa Alvo para cá
-
-        setTimeout(() => {
-            // Chamadas de atualização...
-        }, 500);
-    });
-
+    console.log("Script.js: DOMContentLoaded concluído.");
 }); // FIM DO DOMContentLoaded
 
-console.log("Script.js carregado e inicializado (com mais correções).");
+// As definições duplicadas de loadSection foram removidas do final.
+
+console.log("Script.js totalmente carregado (Baseado no original, estrutura corrigida, caminhos relativos NÃO aplicados nesta versão).");
