@@ -1833,7 +1833,12 @@
             scrollbar-width: none; 
             scrollbar-color: #A020F0 transparent; 
         }
-
+        .janela-filhos.janela-expandida {
+            width: 600px;  /* Novo tamanho expandido horizontalmente */
+            height: 450px; /* Novo tamanho expandido verticalmente */
+            /* Você pode adicionar outros estilos aqui se precisar que algo mais mude
+               quando a janela estiver expandida, por exemplo, tamanho da fonte. */
+        }
         /* Para navegadores baseados em Webkit */
         .janela-filhos::-webkit-scrollbar {
             display: none;
