@@ -1,767 +1,1070 @@
-// =========================================================================
-// FUNÇÃO UNIVERSAL PARA CARREGAR SEÇÕES
-// =========================================================================
-function loadSection(id, url, callback) {
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status} ao carregar ${url}`);
-            }
-            return response.text();
-        })
-        .then(data => {
-            const targetElement = document.getElementById(id);
-            if (targetElement) {
-                targetElement.innerHTML = data;
-                if (callback) {
-                    try {
-                        callback();
-                    } catch (e) {
-                        console.error(`Erro no callback de loadSection para ${id} (${url}):`, e);
-                    }
+
+    // Buffy Música - Função para abrir e fechar a janela de música
+    function toggleJanelaMusica() {
+        const janela = document.getElementById('janelaMusica');
+
+        if (janela.style.display === 'none' || janela.style.display === '') {
+            janela.style.display = 'block'; // Abre a janela
+        } else {
+            janela.style.display = 'none'; // Fecha a janela
+        }
+    }
+
+    // Carregar a seção da música e configurar o player
+    loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
+        const playerMusica = document.querySelector("#janelaMusica iframe");
+        if (playerMusica) {
+            playerMusica.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
+        } else {
+            console.error("O elemento #janelaMusica iframe não foi encontrado.");
+        }
+    });
+
+    // Barra de Experiência
+    loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
+        console.log("Seção Barra de Experiência carregada!");
+    
+        setTimeout(() => {
+            var progressBar = document.getElementById('expBar');
+            if (progressBar) {
+                var percentage = 75; // Atualiza bara EXP
+                progressBar.style.width = percentage + '%';
+    
+                // Atualizar o texto da barra
+                var textSpan = document.querySelector('.barra-texto');
+                if (textSpan) {
+                    textSpan.textContent = '1590 - ' + percentage + '%';
                 }
             } else {
-                console.error(`Elemento com ID '${id}' não encontrado para carregar ${url}. Verifique o HTML principal.`);
+                console.error("Elemento 'expBar' não encontrado.");
             }
-        })
-        .catch(error => console.error(`Erro geral ao carregar a seção ${url} em #${id}:`, error));
-}
+        }, 500); 
+    });
 
-// =========================================================================
-// VARIÁVEIS GLOBAIS (DECLARADAS AQUI, INICIALIZADAS NO DOMCONTENTLOADED OU QUANDO NECESSÁRIO)
-// =========================================================================
-let playerMusicaIsaacGlob, audioGlob, audioSourceGlob, progressBarGlob, tempoAtualGlob, tempoTotalGlob;
-let musicaTocandoGlob = false;
-let carrosselIntervalGlob;
-let chaveAtualSelos = 0; // Movido para global para ser acessado por navegarSelos
-let posicaoCarrosselBencaos = 0; // Movido para global
+    // Cabeçalho - Seção 03
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
+        console.log("Seção Cabeçalho carregada!");
+    });
 
-// =========================================================================
-// DEFINIÇÕES DE FUNÇÕES GLOBAIS (para onclick no HTML)
-// Muitas dessas funções precisam acessar elementos que podem ou não estar
-// carregados ainda. Elas devem ser robustas ou os event listeners
-// devem ser adicionados dinamicamente após o carregamento do conteúdo.
-// =========================================================================
-
-// --- BUFFY MÚSICA (SECAO-AURA) ---
-function toggleJanelaMusica() {
-    const janela = document.getElementById('janelaMusica');
-    if (janela) {
-        janela.style.display = (janela.style.display === 'none' || janela.style.display === '') ? 'block' : 'none';
+    // Classes - Texto retraído
+    loadSection("secao-classes", "Seções/5-Classes.html", function () {
+        console.log("Seção Classes carregada!");
+    });
+    
+    function mostrarTexto() {
+        const expandido = document.querySelector('.expandido');
+        if (expandido) {
+            expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
+        } else {
+            console.error("Elemento '.expandido' não encontrado!");
+        }
     }
-}
 
-// --- CLASSES ---
-// Renomeado de volta para `mostrarTexto` se o HTML usa `onclick="mostrarTexto()"`
-function mostrarTexto() {
-    // Assumindo que o elemento .expandido está dentro de #secao-classes
-    // Se esta seção é carregada dinamicamente, este listener deve ser adicionado no callback de loadSection
-    const expandido = document.querySelector('#secao-classes .expandido');
-    if (expandido) {
-        expandido.style.display = expandido.style.display === 'none' ? 'block' : 'none';
-    } else {
-        console.warn("Classes: Elemento '.expandido' dentro de #secao-classes não encontrado!");
+    // Modo Empusa - Seção 06
+    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function () {
+        console.log("Seção Modo Empusa carregada!");
+    
+        setTimeout(() => {
+            
+            // Atualiza as barras individuais
+            atualizarBarra("prazerBar", "prazer-texto", 99);
+            atualizarBarra("amorBar", "amor-texto", 100);
+            atualizarBarra("sangueBar", "sangue-texto", 47);
+            atualizarBarra("vitalidadeBar", "vitalidade-texto", 100);
+    
+            // Atualiza a barra de Fome baseada na soma de Sangue + Vitalidade
+            atualizarFome();
+
+            // Definir nível de dor e satifação
+            atualizarDor(1);  
+            atualizarSatisfacao("satisfacao-container", "satisfacao", 5);
+            
+            // Função para atualizar barras
+            function atualizarBarra(idBarra, idTexto, porcentagem) {
+                var progressBar = document.getElementById(idBarra);
+                var textSpan = document.getElementById(idTexto);
+    
+                if (progressBar && textSpan) {
+                    progressBar.style.width = porcentagem + '%';
+                    textSpan.textContent = porcentagem + '%';
+                } else {
+                    console.error(`Elemento '${idBarra}' ou '${idTexto}' não encontrado.`);
+                }
+            }
+    
+            // Função para atualizar a barra de Fome 
+            function atualizarFome() {
+                var sangue = parseInt(document.getElementById("sangue-texto").textContent) || 0;
+                var vitalidade = parseInt(document.getElementById("vitalidade-texto").textContent) || 0;
+                var fomeTotal = Math.min(sangue + vitalidade, 100); 
+    
+                atualizarBarra("fomeBar", "fome-texto", fomeTotal);
+            }
+    
+            // Função para abrir/fechar os menus ao clicar na seta azul
+            function toggleMenu(seta) {
+                var menu = seta.parentElement.nextElementSibling;
+    
+                // Fecha todos os menus antes de abrir o novo
+                document.querySelectorAll('.empusa-menu').forEach(m => {
+                    if (m !== menu) {
+                        m.style.display = 'none';
+                    }
+                });
+    
+                // Alterna a visibilidade do menu
+                menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+            }
+    
+            // Adiciona o evento de clique para todas as setas do menu
+            document.querySelectorAll('.empusa-seta').forEach(seta => {
+                seta.addEventListener('click', function () {
+                    toggleMenu(this);
+                });
+            });
+
+            function atualizarDor(nivelDor) {
+                nivelDor = Math.max(0, Math.min(nivelDor, 6));
+            
+                for (let i = 1; i <= 6; i++) {
+                    let coracao = document.getElementById(`coracao-${i}`);
+                    
+                    if (i <= nivelDor) {
+                        coracao.textContent = "💜"; 
+                    } else {
+                        coracao.textContent = "🤍";
+                    }
+                }
+            }
+
+            function atualizarSatisfacao(idContainer, idPrefixo, nivelSatisfacao) {
+                // Garante que o nível de satisfação esteja entre 1 e 6
+                nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
+            
+                // Seleciona apenas os emojis dentro do container correto (Buffy ou Alvo)
+                let container = document.getElementById(idContainer);
+                if (!container) return;
+            
+                // Remove o efeito apenas dos emojis dentro da seção correta
+                container.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
+                    emoji.classList.remove('emoji-selecionado');
+                });
+            
+                // Adiciona o efeito ao emoji correto
+                let emojiSelecionado = document.getElementById(`${idPrefixo}-${nivelSatisfacao}`);
+                if (emojiSelecionado) {
+                    emojiSelecionado.classList.add('emoji-selecionado');
+                }
+            }
+
+        }, 500);
+    });
+
+    // Modo Empusa Alvo - Seção 07
+    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function () {
+        console.log("Seção Modo Empusa - Alvo carregada!");
+    
+        setTimeout(() => {
+            
+            // Atualiza as barras individuais
+            atualizarBarraAlvo("prazerBarAlvo", "prazer-texto-alvo", 98);
+            atualizarBarraAlvo("amorBarAlvo", "amor-texto-alvo", 100);
+            atualizarBarraAlvo("volumeBarAlvo", "volume-texto-alvo", 5);
+            atualizarBarraAlvo("vitalidadeBarAlvo", "vitalide-texto-alvo", 21);
+
+            // Definir nível de dor e satifação    
+            atualizarDorAlvo(3);            
+            atualizarSatisfacao("satisfacao-container-alvo", "satisfacao-alvo", 5);  
+
+            // Definir nível de dominancia
+            atualizarDominancia(73);            
+            
+            function atualizarBarraAlvo(idBarra, idTexto, porcentagem) {
+                var progressBar = document.getElementById(idBarra);
+                var textSpan = document.getElementById(idTexto);
+    
+                if (progressBar && textSpan) {
+                    progressBar.style.width = porcentagem + '%';
+                    textSpan.textContent = porcentagem + '%';
+                }
+            }
+    
+            function atualizarDorAlvo(nivelDor) {
+                for (let i = 1; i <= 6; i++) {
+                    let coracao = document.getElementById(`coracao-alvo-${i}`);
+                    coracao.textContent = i <= nivelDor ? "💜" : "🤍";
+                }
+            }
+
+            function atualizarSatisfacao(idContainer, idPrefixo, nivelSatisfacao) {
+                // Garante que o nível de satisfação esteja entre 1 e 6
+                nivelSatisfacao = Math.max(1, Math.min(nivelSatisfacao, 6));
+            
+                // Seleciona apenas os emojis dentro do container correto (Buffy ou Alvo)
+                let container = document.getElementById(idContainer);
+                if (!container) return;
+            
+                // Remove o efeito apenas dos emojis dentro da seção correta
+                container.querySelectorAll('.emoji-satisfacao').forEach(emoji => {
+                    emoji.classList.remove('emoji-selecionado');
+                });
+            
+                // Adiciona o efeito ao emoji correto
+                let emojiSelecionado = document.getElementById(`${idPrefixo}-${nivelSatisfacao}`);
+                if (emojiSelecionado) {
+                    emojiSelecionado.classList.add('emoji-selecionado');
+                }
+            }
+
+            function atualizarDominancia(porcentagem) {
+                porcentagem = Math.max(0, Math.min(porcentagem, 100)); // Garante que o valor esteja entre 0 e 100
+            
+                let preenchimento = document.getElementById("dominanciaBar");
+                let emoji = document.getElementById("dominancia-emoji");
+            
+                if (preenchimento && emoji) {
+                    // Atualiza o degradê dinâmico conforme a porcentagem
+                    preenchimento.style.background = `linear-gradient(to right, 
+                        #ff12a9 0%, 
+                        #ff12a9 ${Math.max(0, porcentagem - 5)}%, 
+                        #a020f0 ${porcentagem}%, 
+                        #1e90ff ${Math.min(100, porcentagem + 5)}%, 
+                        #1e90ff 100%)`;
+            
+                    // Move o emoji para a posição correspondente
+                    emoji.style.left = `calc(${porcentagem}% - 15px)`;
+                }
+            }
+            
+        }, 500);
+    });
+
+    // Caracteristicas
+    function toggleProfissao() {
+        const detalhes = document.getElementById('detalhesProfissao');
+        if (detalhes.style.display === 'none' || detalhes.style.display === '') {
+            detalhes.style.display = 'block';
+        } else {
+            detalhes.style.display = 'none';
+        }
     }
-}
-
-// --- CARACTERÍSTICAS (PROFISSÃO, ESTADO CIVIL) ---
-function toggleProfissao() {
-    const detalhes = document.getElementById('detalhesProfissao');
-    if (detalhes) {
-        detalhes.style.display = (detalhes.style.display === 'none' || detalhes.style.display === '') ? 'block' : 'none';
-    }
-}
-
-function abrirJanelaEstadoCivil() {
-    const janela = document.getElementById("janelaEstadoCivil");
-    const textoCasada = document.querySelector(".texto-clicavel-isaac");
-    if (janela && textoCasada) {
+    
+    // Estado Civil
+    function abrirJanelaEstadoCivil() {
+        const janela = document.getElementById("janelaEstadoCivil");
+        const textoCasada = document.querySelector(".texto-clicavel-isaac");
         const rect = textoCasada.getBoundingClientRect();
-        janela.style.left = `${rect.right + window.scrollX + 10}px`;
-        janela.style.top = `${rect.top + window.scrollY}px`;
-        janela.style.display = "block";
+        const offsetX = window.pageXOffset || document.documentElement.scrollLeft;
+        const offsetY = window.pageYOffset || document.documentElement.scrollTop;
+    
+        // Define a posição da janela flutuante
+        janela.style.left = `${rect.right + offsetX + 10}px`; 
+        janela.style.top = `${rect.top + offsetY}px`;
+        janela.style.display = "block"; 
     }
-}
-
-function fecharJanelaEstadoCivil() {
-    const janela = document.getElementById("janelaEstadoCivil");
-    if (janela) janela.style.display = "none";
-}
-
-// --- PLAYER DE MÚSICA ISAAC ---
-// !! IMPORTANTE !! Mova as imagens para seu projeto e use caminhos relativos!
-const listaDeMusicasIsaac = [
-    { id: 1, nome: "Crying Alone / Nowhere", autor: "Kurae Radiânthia Pendragon Isaac",
-      capa: "assets/Imagens Isaac/sac2.jpg", // Exemplo de caminho relativo
-      background: "assets/Imagens Isaac/sac1.jpg", // Exemplo de caminho relativo
-      link: "assets/CryingAlone-Nowhere.mp3" }
-];
-const storageKeyIsaac = 'musicasFavoritadasIsaac';
-let musicasFavoritadasIsaac = JSON.parse(localStorage.getItem(storageKeyIsaac)) || {};
-
-function togglePlayerMusicaIsaac() {
-    // Certifique-se que playerMusicaIsaacGlob foi inicializado no DOMContentLoaded
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const player = playerMusicaIsaacGlob;
-    const estadoCivil = document.getElementById('janelaEstadoCivil');
-
-    if (player) {
+    
+    function fecharJanelaEstadoCivil() {
+        const janela = document.getElementById("janelaEstadoCivil");
+        janela.style.display = "none"; 
+    }
+    
+    // Player de Música Isaac
+    function togglePlayerMusicaIsaac() {
+        const player = document.getElementById('playerMusicaIsaac');
+        const estadoCivil = document.getElementById('janelaEstadoCivil');
+    
         if (player.style.display === 'none' || player.style.display === '') {
             player.style.display = 'flex';
-            if (estadoCivil) estadoCivil.style.zIndex = '900';
-            centralizarElementosPlayerIsaac();
-            if (!musicaTocandoGlob) { // Só seleciona e toca se não estiver tocando
-                 selecionarMusicaIsaac(listaDeMusicasIsaac[0].id); // Toca a primeira por padrão ou a última
-            }
+            estadoCivil.style.zIndex = '900';
+            centralizarElementosPlayer();
+            selecionarMusica(1);
         } else {
             player.style.display = 'none';
-            if (estadoCivil) estadoCivil.style.zIndex = '1000';
-            if (audioGlob && musicaTocandoGlob) audioGlob.pause(); // Pausa só se estiver tocando
-            // Não muda musicaTocandoGlob aqui, playPauseIsaac faz isso
+            estadoCivil.style.zIndex = '1000';
         }
-    } else {
-        console.warn("Player Isaac: Elemento '.player-musica-isaac' não encontrado para toggle.");
     }
-}
-
-// Renomeado de volta para `fecharPlayer` se o HTML usa `onclick="fecharPlayer()"`
-function fecharPlayer() {
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const player = playerMusicaIsaacGlob;
-    const estadoCivil = document.getElementById('janelaEstadoCivil');
-
-    if (player) player.style.display = 'none';
-    if (estadoCivil) estadoCivil.style.zIndex = '1000';
-
-    if (audioGlob) {
-        audioGlob.pause();
-        musicaTocandoGlob = false; // Garante que está como pausado
-        atualizarBotaoPlayIsaac();
+    
+    function fecharPlayer() {
+        const player = document.getElementById('playerMusicaIsaac');
+        const estadoCivil = document.getElementById('janelaEstadoCivil');
+    
+        player.style.display = 'none';
+        estadoCivil.style.zIndex = '1000';
+        audio.pause();
+        musicaTocando = false;
+        atualizarBotaoPlay();
     }
-}
-
-function centralizarElementosPlayerIsaac() {
-    if (!playerMusicaIsaacGlob) playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    const capaMusica = playerMusicaIsaacGlob ? playerMusicaIsaacGlob.querySelector('.capa-musica-isaac') : null;
-    const player = playerMusicaIsaacGlob;
-    if (capaMusica && player) {
+    
+    function centralizarElementosPlayer() {
+        const capaMusica = document.querySelector('.capa-musica-isaac');
+        const player = document.querySelector('.player-musica-isaac');
+    
         capaMusica.style.margin = 'auto';
         player.style.display = 'flex';
         player.style.flexDirection = 'column';
         player.style.alignItems = 'center';
         player.style.justifyContent = 'space-between';
     }
-}
-
-function selecionarMusicaIsaac(id) {
-    const musicaSelecionada = listaDeMusicasIsaac.find((musica) => musica.id === id);
-    if (!audioGlob || !audioSourceGlob) {
-        console.warn("Player Isaac: Elementos de áudio não inicializados para selecionar música.");
-        return;
-    }
-    if (musicaSelecionada && playerMusicaIsaacGlob) {
-        const nomeEl = playerMusicaIsaacGlob.querySelector('.nome-musica-isaac');
-        const autorEl = playerMusicaIsaacGlob.querySelector('.autor-musica-isaac');
-        const capaImgEl = playerMusicaIsaacGlob.querySelector('.capa-musica-isaac img');
-
-        if (nomeEl) nomeEl.textContent = musicaSelecionada.nome;
-        if (autorEl) autorEl.textContent = musicaSelecionada.autor;
-        if (capaImgEl) {
-            capaImgEl.src = musicaSelecionada.capa;
-            capaImgEl.onerror = () => console.error(`Player Isaac: Erro ao carregar imagem da capa: ${musicaSelecionada.capa}`);
+    
+    // Lista de músicas com informações
+    const listaDeMusicas = [
+        {
+            id: 1,
+            nome: "Crying Alone / Nowhere",
+            autor: "Kurae Radiânthia Pendragon Isaac",
+            capa: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac2.jpg?raw=true",
+            background: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Imagens%20Isaac/sac1.jpg?raw=true",
+            link: "assets/CryingAlone-Nowhere.mp3",
         }
-        
-        playerMusicaIsaacGlob.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
-        
-        audioSourceGlob.src = musicaSelecionada.link;
-        audioGlob.load(); // Important
-        // O play será acionado por playPauseIsaac ou no togglePlayerMusicaIsaac
-        // Não tocar automaticamente aqui para evitar problemas com autoplay
-        atualizarFavoritoVisualIsaac(id);
-        // Não setar musicaTocandoGlob = true aqui, o playPauseIsaac controla
-    }
-}
+    ];
+    
+    // Capturar elementos corretamente
+    const playerMusica = document.querySelector('.player-musica-isaac');
+    const audio = document.querySelector('#audio-player');
+    const audioSource = document.querySelector('#audio-player source');
+    const progressBar = document.getElementById('progress-bar');
+    const tempoAtual = document.getElementById('tempo-atual');
+    const tempoTotal = document.getElementById('tempo-total');
+    let musicaTocando = false;
 
-function toggleListaMusicasIsaac() {
-    const lista = document.getElementById('listaMusicas');
-    if (lista) {
+    // Botões sempre carregados
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".botao-favoritar-isaac").addEventListener("click", favoritarMusica);
+        document.querySelector(".botao-lista-musicas").addEventListener("click", toggleLista);
+    });
+
+    // Lista de Músicas
+    function selecionarMusica(id) {
+        const musicaSelecionada = listaDeMusicas.find((musica) => musica.id === id);
+    
+        if (musicaSelecionada) {
+            document.querySelector('.nome-musica-isaac').textContent = musicaSelecionada.nome;
+            document.querySelector('.autor-musica-isaac').textContent = musicaSelecionada.autor;
+            document.querySelector('.capa-musica-isaac img').src = musicaSelecionada.capa;
+            document.querySelector('.player-musica-isaac').style.backgroundImage =
+                `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('${musicaSelecionada.background}')`;
+            
+            // **Correção: Atualizar a fonte do áudio corretamente**
+            audioSource.src = musicaSelecionada.link;
+            audio.load(); // Recarregar o áudio após mudar o `src`
+    
+            audio.oncanplaythrough = () => { 
+                audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
+                musicaTocando = true;
+                atualizarBotaoPlay();
+                atualizarFavoritoVisual(id);
+            };
+        }
+    }
+
+    // Abrir/fechar a lista de músicas
+    function toggleLista() {
+        const lista = document.getElementById('listaMusicas');
         lista.style.display = (lista.style.display === 'block') ? 'none' : 'block';
     }
-}
 
-function atualizarFavoritoVisualIsaac(id) {
-    // Certifique-se que o player está no DOM
-    const botaoFavoritar = document.querySelector('.player-musica-isaac .botao-favoritar-isaac');
-    if (botaoFavoritar) {
-        if (musicasFavoritadasIsaac[id]) {
-            botaoFavoritar.classList.add('favoritado');
-            botaoFavoritar.textContent = '💖';
-        } else {
-            botaoFavoritar.classList.remove('favoritado');
-            botaoFavoritar.textContent = '🤍';
+    // Favoritar Músicas
+    const storageKey = 'musicasFavoritadas';
+    let musicasFavoritadas = JSON.parse(localStorage.getItem(storageKey)) || {};
+    
+    function atualizarFavoritoVisual(id) {
+        const botaoFavoritar = document.querySelector('.botao-favoritar-isaac');
+        if (botaoFavoritar) {
+            if (musicasFavoritadas[id]) {
+                botaoFavoritar.classList.add('favoritado');
+                botaoFavoritar.textContent = '💖';
+            } else {
+                botaoFavoritar.classList.remove('favoritado');
+                botaoFavoritar.textContent = '🤍';
+            }
         }
     }
-}
-
-function favoritarMusicaIsaac() {
-    const nomeMusicaAtualEl = document.querySelector('.player-musica-isaac .nome-musica-isaac');
-    if (nomeMusicaAtualEl) {
-        const musicaAtual = listaDeMusicasIsaac.find((musica) => musica.nome === nomeMusicaAtualEl.textContent);
+    
+    function favoritarMusica() {
+        const musicaAtual = listaDeMusicas.find((musica) => 
+            musica.nome === document.querySelector('.nome-musica-isaac').textContent
+        );
         if (musicaAtual) {
-            musicasFavoritadasIsaac[musicaAtual.id] = !musicasFavoritadasIsaac[musicaAtual.id];
-            if (!musicasFavoritadasIsaac[musicaAtual.id]) delete musicasFavoritadasIsaac[musicaAtual.id];
-            atualizarFavoritoVisualIsaac(musicaAtual.id);
-            localStorage.setItem(storageKeyIsaac, JSON.stringify(musicasFavoritadasIsaac));
+            if (musicasFavoritadas[musicaAtual.id]) {
+                delete musicasFavoritadas[musicaAtual.id]; 
+            } else {
+                musicasFavoritadas[musicaAtual.id] = true; 
+            }
+            atualizarFavoritoVisual(musicaAtual.id);
+            localStorage.setItem(storageKey, JSON.stringify(musicasFavoritadas));
         }
     }
-}
-
-function retroceder10sIsaac() {
-    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-        audioGlob.currentTime = Math.max(0, audioGlob.currentTime - 10);
-    }
-}
-
-function avancar10sIsaac() {
-    if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-        audioGlob.currentTime = Math.min(audioGlob.duration, audioGlob.currentTime + 10);
-    }
-}
-
-// Renomeado de volta para `playPause` se o HTML usa `onclick="playPause()"`
-function playPause() {
-    if (!audioGlob) {
-        console.warn("Player Isaac: Elemento de áudio não encontrado para play/pause.");
-        return;
-    }
-    if (musicaTocandoGlob) {
-        audioGlob.pause();
-    } else {
-        // Se o src não estiver definido ou for inválido, o play falhará.
-        // É importante que selecionarMusicaIsaac tenha sido chamado antes.
-        if (!audioGlob.currentSrc && listaDeMusicasIsaac.length > 0) {
-            // Se não tem música carregada, carrega a primeira
-             selecionarMusicaIsaac(listaDeMusicasIsaac[0].id);
-             // O selecionarMusicaIsaac pode tentar tocar, então aguardar o oncanplaythrough
-             // Este play aqui pode ser redundante ou causar erro se o oncanplaythrough já tiver tocado
-             audioGlob.oncanplaythrough = () => { // Reatribui para o caso de ter sido perdido
-                audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada ao tentar tocar após selecionar.", error));
-                musicaTocandoGlob = true;
-                atualizarBotaoPlayIsaac();
-             }
-             return; // Sai para esperar o oncanplaythrough
+    
+    // Botões do Player
+    function retroceder10s() {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = Math.max(0, audio.currentTime - 10);
         }
-        audioGlob.play().catch(error => console.warn("Player Isaac: Reprodução bloqueada pelo navegador.", error));
     }
-    musicaTocandoGlob = !musicaTocandoGlob; // Inverte o estado APÓS a tentativa de play/pause
-    atualizarBotaoPlayIsaac();
-}
-
-function atualizarBotaoPlayIsaac() {
-    const botaoPlay = document.querySelector('.player-musica-isaac .botao-controle-isaac:nth-child(2)');
-    if (botaoPlay) {
-        botaoPlay.textContent = musicaTocandoGlob ? 'II' : '►';
+    
+    function avancar10s() {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+        }
     }
-}
+    
+    function playPause() {
+        if (musicaTocando) {
+            audio.pause();
+            musicaTocando = false;
+        } else {
+            audio.play().catch(error => console.warn("Reprodução bloqueada pelo navegador."));
+            musicaTocando = true;
+        }
+        atualizarBotaoPlay();
+    }
+    
+    function atualizarBotaoPlay() {
+        const botaoPlay = document.querySelector('.botao-controle-isaac:nth-child(2)');
+        botaoPlay.textContent = musicaTocando ? 'II' : '►';
+    }
 
-function formatarTempo(segundos) {
-    if (isNaN(segundos) || !isFinite(segundos) || segundos < 0) return "0:00";
-    const minutos = Math.floor(segundos / 60);
-    const restoSegundos = Math.floor(segundos % 60);
-    return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
-}
+     // Atualizar barra de progresso corretamente
+    progressBar.addEventListener('input', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            audio.currentTime = (progressBar.value / 100) * audio.duration;
+        } else {
+            console.warn("A duração do áudio ainda não está carregada.");
+        }
+    });
 
-function atualizarListaMusicasIsaac() {
-    const listaContainer = document.getElementById('listaMusicas');
-    if (listaContainer) {
+    // Atualizar progresso da música
+    audio.addEventListener('timeupdate', () => {
+        if (!isNaN(audio.currentTime) && isFinite(audio.currentTime)) {
+            tempoAtual.textContent = formatarTempo(audio.currentTime);
+            progressBar.value = (audio.currentTime / audio.duration) * 100;
+        }
+    });
+    
+    // Atualizar tempo total quando a música carregar
+    audio.addEventListener('loadedmetadata', () => {
+        if (!isNaN(audio.duration) && isFinite(audio.duration)) {
+            tempoTotal.textContent = formatarTempo(audio.duration);
+        }
+    });
+    
+    // Formatar tempo
+    function formatarTempo(segundos) {
+        const minutos = Math.floor(segundos / 60);
+        const restoSegundos = Math.floor(segundos % 60);
+        return `${minutos}:${restoSegundos < 10 ? '0' : ''}${restoSegundos}`;
+    }
+    
+    // Atualizar a lista de músicas
+    function atualizarListaMusicas() {
+        const listaContainer = document.getElementById('listaMusicas');
         listaContainer.innerHTML = '';
-        listaDeMusicasIsaac.forEach((musica) => {
+    
+        listaDeMusicas.forEach((musica) => {
             const item = document.createElement('p');
             item.textContent = musica.nome;
-            item.addEventListener('click', () => {
-                selecionarMusicaIsaac(musica.id);
-                if(audioGlob && !musicaTocandoGlob) { // Se não estiver tocando, tenta tocar a nova música
-                    playPause(); // Chama playPause para tentar iniciar a música
-                } else if (audioGlob && musicaTocandoGlob) { // Se já estiver tocando, força o play da nova
-                    audioGlob.play().catch(e => console.warn("Erro ao tocar música selecionada da lista:", e));
-                }
-            });
+            item.addEventListener('click', () => selecionarMusica(musica.id));
             listaContainer.appendChild(item);
         });
     }
-}
-
-// --- TÍTULOS (CARROSSEL) ---
-function abrirJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) janela.style.display = 'block';
-}
-
-function fecharJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) {
-        janela.style.display = 'none';
-        // A função iniciarCarrosselTitulos será chamada pelo mouseout do container se o carrossel ainda existir
-    }
-}
-
-function expandirJanelaTitulo(id) {
-    const janela = document.getElementById(`janelaTitulo${id}`);
-    if (janela) janela.classList.toggle('janela-expandida');
-}
-
-// --- ATRIBUTOS ---
-function toggleCheckboxAtributo(element) {
-    element.classList.toggle("checked");
-}
-
-// --- SELOS ---
-const selosChavesData = [ /* Seus dados de chaves aqui, igual ao anterior */
-    { id: 0, nome: "Key of Souls", descricao: "Nenhuma informação sobre a chave Key of Souls está disponível.", item: "assets/Recursos/Key of Souls.png", efeito: "À descobrir 01.", icone: "https://imgur.com/zHQo8sh.png", detalhes: "Esta chave é um teste da alinezinha1"},
-    { id: 1, nome: "Key of Dreams", descricao: "Nenhuma informação sobre a chave Key of Dreams está disponível.", item: "assets/Recursos/Key of Dreams.png", efeito: "À descobrir 02.", icone: "https://imgur.com/lKXdgwT.png", detalhes: "Esta chave é um teste da alinezinha2"},
-    { id: 2, nome: "Key of Infinite Moon Mansion", descricao: "Nenhuma informação sobre a chave Key of Infinite Moon Mansion está disponível.", item: "assets/Recursos/Key of Infinite Moon Mansion.png", efeito: "À descobrir 03.", icone: "https://imgur.com/Hf705GX.png", detalhes: "Esta chave é um teste da alinezinha3"},
-    { id: 3, nome: "Key of Desires", descricao: "Nenhuma informação sobre a chave Key of Desires está disponível.", item: "assets/Recursos/Key of Desires.png", efeito: "À descobrir 04.", icone: "https://imgur.com/L2bLSl2.png", detalhes: "Esta chave é um teste da alinezinha4"},
-    { id: 4, nome: "Key of Soul World", descricao: "Nenhuma informação sobre a chave Key of Soul World está disponível.", item: "assets/Recursos/Key of Soul World.png", efeito: "À descobrir 05.", icone: "https://imgur.com/X1zPnlJ.png", detalhes: "Esta chave é um teste da alinezinha5"},
-    { id: 5, nome: "Key of Pendragon", descricao: "Nenhuma informação sobre a chave Key of Pendragon está disponível.", item: "assets/Recursos/Key of Pendragon.png", efeito: "À descobrir 06.", icone: "assets/Recursos/Key of Pendragon.png", detalhes: "Esta chave é um teste da alinezinha6"},
-    { id: 6, nome: "Key Pinnacle of Flames", descricao: "Nenhuma informação sobre a chave Key Pinnacle of Flames está disponível.", item: "assets/Recursos/Key Pinnacle of Flames.png", efeito: "À descobrir 07.", icone: "https://imgur.com/46Dh8W2.png", detalhes: "Esta chave é um teste da alinezinha7"},
-    { id: 7, nome: "Key of Isaac's Heart", descricao: "Nenhuma informação sobre a chave Key of Isaac's Heart está disponível.", item: "assets/Recursos/Key of Isaac's Heart.png", efeito: "À descobrir 08.", icone: "assets/Recursos/Key of Isaac's Heart.png", detalhes: "Esta chave é um teste da alinezinha8"},
-];
-const selosEstadosIniciais = { circulo1: true, circulo2: false, circulo3: true, circulo4: false, circulo5: true, circulo6: false, circulo7: true, circulo8: false };
-
-// Renomeado de volta para `navegar` se o HTML usa `onclick="navegar()"`
-function navegar(direcao) {
-    chaveAtualSelos = (chaveAtualSelos + direcao + selosChavesData.length) % selosChavesData.length;
-    const chave = selosChavesData[chaveAtualSelos];
-    if (!chave) return;
-
-    const tituloItemEl = document.getElementById("titulo-item");
-    const descDetalhadaEl = document.querySelector("#retangulo-item .descricao-detalhada");
-    const itemImagemEl = document.querySelector(".item-imagem img");
-    const tituloEfeitoEl = document.querySelector("#retangulo-efeitos .titulo-efeito");
-    const iconeEfeitoEl = document.querySelector("#retangulo-efeitos img");
-    const detalhesEfeitoEl = document.querySelector("#retangulo-efeitos .detalhes-detalhados");
-
-    if (tituloItemEl) tituloItemEl.textContent = chave.nome;
-    if (descDetalhadaEl) descDetalhadaEl.textContent = chave.descricao;
-    if (itemImagemEl) {
-        itemImagemEl.src = chave.item;
-        itemImagemEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do item: ${chave.item}`);
-    }
-    if (tituloEfeitoEl) tituloEfeitoEl.textContent = chave.efeito;
-    if (iconeEfeitoEl) {
-        iconeEfeitoEl.src = chave.icone;
-        iconeEfeitoEl.onerror = () => console.error(`Selos: Erro ao carregar imagem do ícone: ${chave.icone}`);
-    }
-    if (detalhesEfeitoEl) detalhesEfeitoEl.textContent = chave.detalhes;
     
-    atualizarDestaqueCirculoSelos(chaveAtualSelos + 1);
-}
-
-function atualizarDestaqueCirculoSelos(id) {
-    document.querySelectorAll(".circulo-pequeno").forEach((circulo, index) => {
-        circulo.style.boxShadow = (index + 1 === id) ? "0 0 10px 3px #FFD700" : "none";
-    });
-}
-function toggleCirculo1() { document.getElementById('circulo1')?.classList.toggle('ativo'); }
-// ... ( toggleCirculo2 a toggleCirculo8 da mesma forma)
-function toggleCirculo2() { document.getElementById('circulo2')?.classList.toggle('ativo'); }
-function toggleCirculo3() { document.getElementById('circulo3')?.classList.toggle('ativo'); }
-function toggleCirculo4() { document.getElementById('circulo4')?.classList.toggle('ativo'); }
-function toggleCirculo5() { document.getElementById('circulo5')?.classList.toggle('ativo'); }
-function toggleCirculo6() { document.getElementById('circulo6')?.classList.toggle('ativo'); }
-function toggleCirculo7() { document.getElementById('circulo7')?.classList.toggle('ativo'); }
-function toggleCirculo8() { document.getElementById('circulo8')?.classList.toggle('ativo'); }
-
-
-// --- BENÇÃOS E MALDIÇÕES ---
-// Renomeado de volta para `moverCarrossel` se o HTML usa `onclick="moverCarrossel()"`
-function moverCarrossel(direcao) {
-    const carrossel = document.querySelector('.carrossel-diamantes');
-    if (!carrossel) return;
-    const itens = carrossel.querySelectorAll('.diamante-item');
-    if (itens.length === 0) return;
-
-    itens.forEach(item => item.classList.remove('ativo'));
-    posicaoCarrosselBencaos = (posicaoCarrosselBencaos + direcao + itens.length) % itens.length;
-    
-    if (itens[posicaoCarrosselBencaos]) { // Verifica se o item existe
-        itens[posicaoCarrosselBencaos].classList.add('ativo');
-        const tamanhoItem = itens[posicaoCarrosselBencaos].offsetWidth + 10;
-        const scrollTarget = (posicaoCarrosselBencaos * tamanhoItem) - (carrossel.offsetWidth / 2) + (tamanhoItem / 2);
-        carrossel.scrollTo({ left: scrollTarget, behavior: 'smooth' });
-    }
-}
-// Renomeado de volta para `abrirJanela` e `fecharJanela` se o HTML usa esses nomes
-function abrirJanela(idJanela) {
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.style.display = 'block';
-}
-function fecharJanela(idJanela) {
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.style.display = 'none';
-}
-function expandirJanela(idJanela) { // Este nome estava consistente
-    const janela = document.getElementById(idJanela);
-    if (janela) janela.classList.toggle('janela-expandida');
-}
-
-// --- FILHOS (JANELAS FLUTUANTES) ---
-function abrirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'block'; }
-function fecharJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.style.display = 'none'; }
-function expandirJanelaFilho(id) { const janela = document.getElementById(`janelaFilho${id}`); if (janela) janela.classList.toggle('janela-expandida'); }
-
-// --- FUNÇÃO UTILITÁRIA PARA ARRASTAR JANELAS (igual à anterior) ---
-function addDragEventsToWindow(janela) { /* ... código de addDragEventsToWindow ... */
-    let isDragging = false, startX, startY, offsetX, offsetY;
-    const dragHandle = janela.querySelector('.janela-cabecalho-arrastavel') || janela; 
-
-    dragHandle.addEventListener('mousedown', (e) => {
-        if (e.target.closest('button, input, a, .no-drag')) return;
-        isDragging = true;
-        const rect = janela.getBoundingClientRect();
-        startX = e.clientX - rect.left + janela.offsetLeft; // Ajuste para offsetLeft/Top
-        startY = e.clientY - rect.top + janela.offsetTop;  // Ajuste para offsetLeft/Top
-        janela.style.cursor = 'grabbing';
-    });
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            janela.style.left = `${e.clientX - startX + window.scrollX}px`; // Adicionado scrollX/Y
-            janela.style.top = `${e.clientY - startY + window.scrollY}px`;
-        }
-    });
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            janela.style.cursor = 'move';
-        }
-    });
-    dragHandle.style.cursor = 'move';
-}
-
-
-// =========================================================================
-// CÓDIGO QUE RODA APÓS O DOM ESTAR COMPLETAMENTE CARREGADO
-// =========================================================================
-document.addEventListener("DOMContentLoaded", function () {
-
-    // --- INICIALIZAÇÃO PLAYER DE MÚSICA ISAAC ---
-    playerMusicaIsaacGlob = document.querySelector('.player-musica-isaac');
-    audioGlob = document.querySelector('#audio-player');
-    audioSourceGlob = audioGlob ? audioGlob.querySelector('source') : null;
-    progressBarGlob = document.getElementById('progress-bar');
-    tempoAtualGlob = document.getElementById('tempo-atual');
-    tempoTotalGlob = document.getElementById('tempo-total');
-
-    // Adicionar listeners aos botões do player Isaac se eles existem no DOM principal
-    const btnFavoritarIsaac = document.querySelector(".player-musica-isaac .botao-favoritar-isaac");
-    if (btnFavoritarIsaac) {
-        btnFavoritarIsaac.addEventListener("click", favoritarMusicaIsaac);
-    } else {
-        console.warn("Player Isaac: Botão '.botao-favoritar-isaac' não encontrado no DOMContentLoaded.");
-    }
-
-    const btnListaMusicasIsaac = document.querySelector(".player-musica-isaac .botao-lista-musicas");
-    if (btnListaMusicasIsaac) {
-        btnListaMusicasIsaac.addEventListener("click", toggleListaMusicasIsaac);
-    } else {
-        console.warn("Player Isaac: Botão '.botao-lista-musicas' não encontrado no DOMContentLoaded (ou precisa de seletor mais específico se dentro do player).");
-    }
-
-    if (progressBarGlob && audioGlob) {
-        progressBarGlob.addEventListener('input', () => {
-            if (audioGlob && !isNaN(audioGlob.duration) && isFinite(audioGlob.duration)) {
-                audioGlob.currentTime = (progressBarGlob.value / 100) * audioGlob.duration;
-            }
-        });
-    }
-
-    if (audioGlob) {
-        audioGlob.addEventListener('timeupdate', () => {
-            if (tempoAtualGlob && !isNaN(audioGlob.currentTime)) tempoAtualGlob.textContent = formatarTempo(audioGlob.currentTime);
-            if (progressBarGlob && audioGlob.duration && !isNaN(audioGlob.duration)) progressBarGlob.value = (audioGlob.currentTime / audioGlob.duration) * 100;
-        });
-        audioGlob.addEventListener('loadedmetadata', () => {
-            if (tempoTotalGlob && !isNaN(audioGlob.duration)) tempoTotalGlob.textContent = formatarTempo(audioGlob.duration);
-        });
-        audioGlob.addEventListener('ended', () => {
-            musicaTocandoGlob = false;
-            atualizarBotaoPlayIsaac();
-            // Opcional: tocar a próxima música
-        });
-         audioGlob.addEventListener('play', () => { // Quando o áudio realmente começa a tocar
-            musicaTocandoGlob = true;
-            atualizarBotaoPlayIsaac();
-        });
-        audioGlob.addEventListener('pause', () => { // Quando o áudio é pausado
-            musicaTocandoGlob = false;
-            atualizarBotaoPlayIsaac();
-        });
-    }
-
-    // Carregar lista e (mas não selecionar/tocar) músicas do Player Isaac
-    // A seleção/play acontece com togglePlayerMusicaIsaac ou playPause
-    if (document.getElementById('listaMusicas')) {
-        atualizarListaMusicasIsaac();
+    // Carregar primeira música ao iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarListaMusicas();
+        selecionarMusica(1); // Carregar a primeira música
         document.getElementById('listaMusicas').style.display = 'none';
-        if (playerMusicaIsaacGlob) atualizarBotaoPlayIsaac(); // Atualiza o botão para o estado inicial
-    }
+        atualizarBotaoPlay();
+    });
 
-    // --- FAMA/MORAL E AUTOESTIMA (Funções de atualização chamadas diretamente abaixo) ---
-    function atualizarBarraStatus(idBarra, idTexto, porcentagem, idStatus = null) { /* ...código da função... */
+    // Fama/Moral - Barra de Progresso e Estado
+    function atualizarBarra(idBarra, idTexto, porcentagem, idStatus = null) {
         const barra = document.getElementById(idBarra);
         const texto = document.getElementById(idTexto);
-        if (barra && texto) {
-            barra.style.width = `${porcentagem}%`;
-            texto.textContent = `${porcentagem}%`;
-            let cor;
-            if (porcentagem <= 20) cor = 'darkred'; else if (porcentagem <= 40) cor = '#FF9100';
-            else if (porcentagem <= 60) cor = '#00D19A'; else if (porcentagem <= 80) cor = '#D622EF';
-            else cor = '#6222EF';
-            barra.style.backgroundColor = cor;
-            if (idStatus) {
-                const statusEl = document.getElementById(idStatus);
-                if (statusEl) {
-                    let textoStatus;
-                    if (porcentagem <= 20) textoStatus = 'Infame - Condenado - Vilão - Corrupto';
-                    else if (porcentagem <= 40) textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
-                    else if (porcentagem <= 60) textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
-                    else if (porcentagem <= 80) textoStatus = 'Respeitado - Admirado - Herói - Protetor';
-                    else textoStatus = 'Renomado - Lendário - Venerado - Salvador';
-                    statusEl.textContent = textoStatus;
-                }
+        
+        // Atualiza a largura da barra e o texto central com a porcentagem
+        barra.style.width = `${porcentagem}%`;
+        texto.textContent = `${porcentagem}%`;
+
+        // Define cor baseada na porcentagem
+        let cor;
+        if (porcentagem <= 20) {
+            cor = 'darkred';
+        } else if (porcentagem <= 40) {
+            cor = '#FF9100';
+        } else if (porcentagem <= 60) {
+            cor = '#00D19A';
+        } else if (porcentagem <= 80) {
+            cor = '#D622EF';
+        } else {
+            cor = '#6222EF';
+        }
+        barra.style.backgroundColor = cor;
+
+        // Atualiza o status apenas se o ID de status for fornecido
+        if (idStatus) {
+            const status = document.getElementById(idStatus);
+            let textoStatus;
+
+            if (porcentagem <= 20) {
+                textoStatus = 'Infame - Condenado - Vilão - Corrupto';
+            } else if (porcentagem <= 40) {
+                textoStatus = 'Desprezado - Mal-Visto - Suspeito - Anti-Herói';
+            } else if (porcentagem <= 60) {
+                textoStatus = 'Ambíguo - Neutro - Indiferente - Equilibrado';
+            } else if (porcentagem <= 80) {
+                textoStatus = 'Respeitado - Admirado - Herói - Protetor';
+            } else {
+                textoStatus = 'Renomado - Lendário - Venerado - Salvador';
+            }
+
+            status.textContent = textoStatus;
+        }
+    }
+
+    // Autoestima - Atualiza apenas a cor e porcentagem
+    atualizarBarra('barra-autoestima', 'texto-autoestima', 98);
+
+    // Fama / Moral - Atualiza cor, porcentagem e status
+    atualizarBarra('barra-fama', 'texto-fama', 97, 'status-fama');
+    
+    // Títulos - Carrossel Automático
+    let carrosselInterval;
+    const carrossel = document.querySelector('.carrossel-imagens');
+    const carrosselContainer = document.querySelector('.carrossel-titulos');
+    
+    // Inicia o carrossel com movimento automático
+    function iniciarCarrossel() {
+        carrosselInterval = setInterval(() => {
+            // Move o carrossel suavemente
+            carrossel.scrollLeft += 1;
+            if (carrossel.scrollLeft >= carrossel.scrollWidth - carrossel.offsetWidth) {
+                carrossel.scrollLeft = 0; // Reinicia quando atingir o final
+            }
+        }, 30); // Velocidade ajustável
+    }
+    
+    // Pausa o movimento do carrossel
+    function pausarCarrossel() {
+        clearInterval(carrosselInterval);
+    }
+    
+    // Eventos para pausa e retomada do movimento
+    carrosselContainer.addEventListener('mouseover', pausarCarrossel);
+    carrosselContainer.addEventListener('mouseout', iniciarCarrossel);
+    
+    // Gerenciar cliques nas bolinhas do carrossel
+    document.querySelectorAll('.titulo-item').forEach((item) => {
+        item.addEventListener('click', (e) => {
+            pausarCarrossel(); // Pausa o carrossel ao clicar
+            const id = e.currentTarget.getAttribute('onclick').match(/\d+/)[0];
+            abrirJanelaTitulo(id); // Abre a janela flutuante associada
+        });
+    });
+    
+    // Função para abrir a janela flutuante
+    function abrirJanelaTitulo(id) {
+        const janela = document.getElementById(`janelaTitulo${id}`);
+        if (janela) {
+            janela.style.display = 'block';
+        }
+    }
+    
+    // Função para fechar a janela flutuante
+    function fecharJanelaTitulo(id) {
+        const janela = document.getElementById(`janelaTitulo${id}`);
+        if (janela) {
+            janela.style.display = 'none';
+            iniciarCarrossel(); // Reinicia o carrossel ao fechar a janela
+        }
+    }
+    
+    // Expande ou minimiza a janela flutuante
+    function expandirJanelaTitulo(id) {
+        const janela = document.getElementById(`janelaTitulo${id}`);
+        janela.classList.toggle('janela-expandida');
+    }
+    
+    // Movimentação manual das janelas flutuantes
+    document.querySelectorAll('.janela-titulos').forEach((janela) => {
+        let isDragging = false, startX, startY;
+    
+        janela.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - janela.offsetLeft;
+            startY = e.clientY - janela.offsetTop;
+            janela.style.cursor = 'grabbing';
+        });
+    
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                janela.style.left = `${e.clientX - startX}px`;
+                janela.style.top = `${e.clientY - startY}px`;
+            }
+        });
+    
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            janela.style.cursor = 'move';
+        });
+    });
+    
+    // Inicia o carrossel automaticamente ao carregar a página
+    document.addEventListener('DOMContentLoaded', iniciarCarrossel);
+    
+     // Atributos - Função para atualizar a barra de atributo com valor e total
+    function toggleCheckbox(element) {
+        element.classList.toggle("checked");
+    }
+
+    function atualizarAtributoAtual(atributo, total, porcentagem) {
+        const valorAtual = Math.floor((porcentagem / 100) * total);
+        document.getElementById(`texto-${atributo}`).innerText = `${valorAtual} / ${total}`;
+        document.getElementById(`barra-${atributo}`).style.width = `${porcentagem}%`;
+    }
+
+    // Atributos - Definindo valores e porcentagens iniciais para cada atributo
+    const atributos = {
+        hp: { total: 4910210, porcentagem: 100 },
+        mp: { total: 823691, porcentagem: 100 },
+        agi: { total: 637369, porcentagem: 100 },
+        def: { total: 1476557, porcentagem: 100 },
+        res: { total: 1331048, porcentagem: 100 },
+        spd: { total: 1020989, porcentagem: 100 },
+        int: { total: 431815, porcentagem: 100 },
+        atk: { total: 2075839, porcentagem: 100 },
+        smp: { total: 291363290, porcentagem: 99.17 },
+        unknown: { total: 100, porcentagem: 50 }
+    };
+
+    // Atributos - Atualizando os valores e porcentagens das barras
+    for (let atributo in atributos) {
+        const { total, porcentagem } = atributos[atributo];
+        atualizarAtributoAtual(atributo, total, porcentagem);
+    }
+    
+    // Selos - Define o estado inicial
+    let chaveAtual = 0;
+    
+    // Selos - Dados das chaves
+    const chaves = [
+        { id: 0,
+         nome: "Key of Souls",
+         descricao: "Nenhuma informação sobre a chave Key of Souls está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Souls.png?raw=true",
+         efeito: "À descobrir 01.",
+         icone: "https://imgur.com/zHQo8sh.png",
+         detalhes: "Esta chave é um teste da alinezinha1"},
+        
+        { id: 1,
+         nome: "Key of Dreams",
+         descricao: "Nenhuma informação sobre a chave Key of Dreams está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Dreams.png?raw=true",
+         efeito: "À descobrir 02.",
+         icone: "https://imgur.com/lKXdgwT.png",
+         detalhes: "Esta chave é um teste da alinezinha2"},
+        
+        { id: 2,
+         nome: "Key of Infinite Moon Mansion",
+         descricao: "Nenhuma informação sobre a chave Key of Infinite Moon Mansion está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Infinite%20Moon%20Mansion.png?raw=true",
+         efeito: "À descobrir 03.",
+         icone: "https://imgur.com/Hf705GX.png",
+         detalhes: "Esta chave é um teste da alinezinha3"},
+        
+        { id: 3,
+         nome: "Key of Desires",
+         descricao: "Nenhuma informação sobre a chave Key of Desires está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Desires.png?raw=true",
+         efeito: "À descobrir 04.",
+         icone: "https://imgur.com/L2bLSl2.png",
+         detalhes: "Esta chave é um teste da alinezinha4"},
+        
+        { id: 4,
+         nome: "Key of Soul World",
+         descricao: "Nenhuma informação sobre a chave Key of Soul World está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Soul%20World.png?raw=true",
+         efeito: "À descobrir 05.",
+         icone: "https://imgur.com/X1zPnlJ.png",
+         detalhes: "Esta chave é um teste da alinezinha5"},
+        
+        { id: 5,
+         nome: "Key of Pendragon",
+         descricao: "Nenhuma informação sobre a chave Key of Pendragon está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Pendragon.png?raw=true",
+         efeito: "À descobrir 06.",
+         icone: "assets/Recursos/Key of Pendragon.png",
+         detalhes: "Esta chave é um teste da alinezinha6"},
+        
+        { id: 6,
+         nome: "Key Pinnacle of Flames",
+         descricao: "Nenhuma informação sobre a chave Key Pinnacle of Flames está disponível.",
+         item: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20Pinnacle%20of%20Flames.png?raw=true",
+         efeito: "À descobrir 07.",
+         icone: "https://imgur.com/46Dh8W2.png",
+         detalhes: "Esta chave é um teste da alinezinha7"},
+        
+        { id: 7,
+         nome: "Key of Isaac's Heart",
+         descricao: "Nenhuma informação sobre a chave Key of Isaac's Heart está disponível.",
+         item: "assets/Recursos/Key of Isaac's Heart.png",
+         efeito: "À descobrir 08.",
+         icone: "https://github.com/Cueinhah/Painel-de-Buffy/blob/main/assets/Recursos/Key%20of%20Isaac's%20Heart.png?raw=true",
+         detalhes: "Esta chave é um teste da alinezinha8"},
+    ];
+    
+    // Selos - Atualiza os detalhes do retângulo com base na chave selecionada
+    function navegar(direcao) {
+        chaveAtual = (chaveAtual + direcao + chaves.length) % chaves.length;
+        const chave = chaves[chaveAtual];
+    
+        // Atualiza Retângulo Item
+        document.getElementById("titulo-item").textContent = chave.nome;
+        document.querySelector("#retangulo-item .descricao-detalhada").textContent = chave.descricao;
+
+        // Atualiza a imagem no Item-Imagem
+        document.querySelector(".item-imagem img").src = chave.item;
+        
+        // Atualiza Retângulo Efeitos
+        document.querySelector("#retangulo-efeitos .titulo-efeito").textContent = chave.efeito;
+        document.querySelector("#retangulo-efeitos img").src = chave.icone;
+        document.querySelector("#retangulo-efeitos .detalhes-detalhados").textContent = chave.detalhes;
+        
+        // Atualiza Destaque dos Círculos
+        atualizarDestaqueCirculo(chaveAtual + 1);
+    }
+    
+    // Selos - Atualiza o destaque dourado nos círculos pequenos
+    function atualizarDestaqueCirculo(id) {
+        document.querySelectorAll(".circulo-pequeno").forEach((circulo, index) => {
+            if (index + 1 === id) {
+                circulo.style.boxShadow = "0 0 10px 3px #FFD700"; // Adiciona o destaque
+            } else {
+                circulo.style.boxShadow = "none"; // Remove o destaque
+            }
+        });
+    }
+    
+    // Selos - Previne caixas de texto editáveis e comportamento indesejado
+    document.querySelectorAll(".titulo-item, .titulo-efeito, .descricao-detalhada").forEach(elemento => {
+        elemento.contentEditable = "false"; // Impede edição
+    });
+
+  // Selos - Define o estado inicial dos círculos (ativo ou inativo)
+    const estadosIniciais = {
+        circulo1: true,  // Ativo
+        circulo2: false, // Inativo
+        circulo3: true,  // Ativo
+        circulo4: false, // Inativo
+        circulo5: true,  // Ativo
+        circulo6: false, // Inativo
+        circulo7: true,  // Ativo
+        circulo8: false  // Inativo
+    };
+    
+    // Selos - Aplica os estados iniciais ao carregar a página
+    document.addEventListener("DOMContentLoaded", function () {
+        for (const [id, ativo] of Object.entries(estadosIniciais)) {
+            const circulo = document.getElementById(id);
+            if (ativo) {
+                circulo.classList.add('ativo');
+            } else {
+                circulo.classList.remove('ativo');
             }
         }
+    });
+    
+    // Selos - Funções para alternar o estado de cada círculo
+    function toggleCirculo1() {
+        toggleEstado('circulo1');
     }
-    atualizarBarraStatus('barra-autoestima', 'texto-autoestima', 98);
-    atualizarBarraStatus('barra-fama', 'texto-fama', 97, 'status-fama');
-
-    // --- CARROSSEL DE TÍTULOS ---
-    const carrosselTitulosEl = document.querySelector('.carrossel-titulos .carrossel-imagens');
-    const carrosselContainerTitulosEl = document.querySelector('.carrossel-titulos');
-    function iniciarCarrosselTitulos() { /* ...código da função... */
-        if (!carrosselTitulosEl) return; clearInterval(carrosselIntervalGlob);
-        carrosselIntervalGlob = setInterval(() => {
-            carrosselTitulosEl.scrollLeft += 1;
-            if (carrosselTitulosEl.scrollLeft >= carrosselTitulosEl.scrollWidth - carrosselTitulosEl.offsetWidth -1) carrosselTitulosEl.scrollLeft = 0;
-        }, 30);
+    
+    function toggleCirculo2() {
+        toggleEstado('circulo2');
     }
-    function pausarCarrosselTitulos() { clearInterval(carrosselIntervalGlob); }
-
-    if (carrosselTitulosEl && carrosselContainerTitulosEl) {
-        iniciarCarrosselTitulos();
-        carrosselContainerTitulosEl.addEventListener('mouseover', pausarCarrosselTitulos);
-        carrosselContainerTitulosEl.addEventListener('mouseout', iniciarCarrosselTitulos);
-        // Listeners para .titulo-item são adicionados via onclick no HTML, chamando abrirJanelaTitulo(id)
+    
+    function toggleCirculo3() {
+        toggleEstado('circulo3');
     }
-    document.querySelectorAll('.janela-titulos').forEach(addDragEventsToWindow);
-
-
-    // --- ATRIBUTOS ---
-    const atributosData = { /* ...seus dados... */
-        hp: { total: 4910210, porcentagem: 100 }, mp: { total: 823691, porcentagem: 100 },
-        agi: { total: 637369, porcentagem: 100 }, def: { total: 1476557, porcentagem: 100 },
-        res: { total: 1331048, porcentagem: 100 }, spd: { total: 1020989, porcentagem: 100 },
-        int: { total: 431815, porcentagem: 100 }, atk: { total: 2075839, porcentagem: 100 },
-        smp: { total: 291363290, porcentagem: 99.17 }, unknown: { total: 100, porcentagem: 50 }
-    };
-    function atualizarAtributoAtual(atributo, total, porcentagem) { /* ...código da função... */
-        const textoEl = document.getElementById(`texto-${atributo}`);
-        const barraEl = document.getElementById(`barra-${atributo}`);
-        if (textoEl && barraEl) {
-            const valorAtual = Math.floor((porcentagem / 100) * total);
-            textoEl.innerText = `${valorAtual} / ${total}`;
-            barraEl.style.width = `${porcentagem}%`;
-        }
+    
+    function toggleCirculo4() {
+        toggleEstado('circulo4');
     }
-    for (let atributo in atributosData) {
-        atualizarAtributoAtual(atributo, atributosData[atributo].total, atributosData[atributo].porcentagem);
+    
+    function toggleCirculo5() {
+        toggleEstado('circulo5');
     }
-
-    // --- SELOS ---
-    for (const [id, ativo] of Object.entries(selosEstadosIniciais)) {
+    
+    function toggleCirculo6() {
+        toggleEstado('circulo6');
+    }
+    
+    function toggleCirculo7() {
+        toggleEstado('circulo7');
+    }
+    
+    function toggleCirculo8() {
+        toggleEstado('circulo8');
+    }
+    
+    // Selos - Função genérica para alternar estado
+    function toggleEstado(id) {
         const circulo = document.getElementById(id);
-        if (circulo) { if (ativo) circulo.classList.add('ativo'); else circulo.classList.remove('ativo'); }
+        circulo.classList.toggle('ativo');
     }
-    document.querySelectorAll("#retangulo-item .titulo-item, #retangulo-efeitos .titulo-efeito, #retangulo-item .descricao-detalhada")
-        .forEach(el => el.contentEditable = "false");
-    if (document.getElementById("titulo-item")) { // Verifica se o container dos selos existe
-         navegar(0); // Chama a função global `navegar`
+    
+    // Bençãos e Maldições - Controla a posição do carrossel
+    let posicaoCarrossel = 0;
+
+    function moverCarrossel(direcao) {
+        const carrossel = document.querySelector('.carrossel-diamantes');
+        const itens = carrossel.querySelectorAll('.diamante-item');
+    
+        // Remove a classe 'ativo' de todos os itens
+        itens.forEach(item => item.classList.remove('ativo'));
+    
+        // Atualiza a posição
+        posicaoCarrossel = (posicaoCarrossel + direcao + itens.length) % itens.length;
+    
+        // Adiciona a classe 'ativo' ao novo item central
+        itens[posicaoCarrossel].classList.add('ativo');
+    
+        // Faz o scroll horizontal para manter o item central visível
+        const tamanhoItem = itens[posicaoCarrossel].offsetWidth + 10; // Inclui o gap
+        carrossel.scrollLeft = posicaoCarrossel * tamanhoItem - (carrossel.clientWidth - tamanhoItem) / 2;
     }
 
-    // --- BENÇÃOS E MALDIÇÕES ---
-    const diamantesCarrossel = document.querySelectorAll('.diamante-item');
-    if (diamantesCarrossel.length > 0) {
-        const meio = Math.floor(diamantesCarrossel.length / 2);
-        if (diamantesCarrossel[meio]) diamantesCarrossel[meio].classList.add('ativo');
-        moverCarrossel(0); // Chama a função global `moverCarrossel`
-    }
-    document.querySelectorAll('.janela-bencao').forEach(addDragEventsToWindow);
+    // Bençãos e Maldições - Diamante do Meio
+    document.addEventListener("DOMContentLoaded", () => {
+        const diamantes = document.querySelectorAll('.diamante-item');
+        const meio = Math.floor(diamantes.length / 2);
+        diamantes[meio].classList.add('ativo');
+    });
 
-    // --- BARRA EA ---
-    function atualizarEA(porcentagem) { /* ...código da função... */
+    
+    // Bençãos e Maldições - Abrir Janela Flutuante
+    function abrirJanela(idJanela) {
+        console.log(`Janela ${idJanela} aberta`); // Para teste
+        const janela = document.getElementById(idJanela);
+        janela.style.display = 'block';
+    }
+
+    // Bençãos e Maldições - Fechar Janela Flutuante
+    function fecharJanela(idJanela) {
+        const janela = document.getElementById(idJanela);
+        janela.style.display = 'none';
+    }
+
+    // Bençãos e Maldições - Expandir ou Reduzir Janela
+    function expandirJanela(idJanela) {
+        const janela = document.getElementById(idJanela);
+        janela.classList.toggle('janela-expandida');
+    }
+
+    // Bençãos e Maldições - Tornar a Janela Arrastável
+    document.querySelectorAll('.janela-bencao').forEach((janela) => {
+        let isDragging = false, startX, startY;
+
+        janela.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - janela.offsetLeft;
+            startY = e.clientY - janela.offsetTop;
+            janela.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                janela.style.left = `${e.clientX - startX}px`;
+                janela.style.top = `${e.clientY - startY}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            janela.style.cursor = 'move';
+        });
+    });
+
+    // Barra EA
+    function atualizarEA(porcentagem) {
         const barraEA = document.getElementById('preenchimento-ea');
         const textoEA = document.getElementById('texto-ea');
-        if (barraEA && textoEA) {
-            porcentagem = Math.max(0, Math.min(100, porcentagem));
-            barraEA.style.width = `${porcentagem}%`;
-            textoEA.textContent = `EA: ${porcentagem}%`;
-        }
-    }
-    atualizarEA(86);
-
-    // --- NECESSIDADES BÁSICAS E TEMPORÁRIAS ---
-    function atualizarStatusBasicas(grupoId, porcentagem) { /* ...código da função... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
-        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
-        const statusIndicator = document.getElementById(`estado-${grupoId}`);
-        if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
-            let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
-            else if (porcentagem <= 5) { color = 'darkred'; status = 'Crítico'; } else if (porcentagem <= 30) { color = 'red'; status = 'Baixo'; }
-            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'green'; status = 'Bom'; }
-            else if (porcentagem <= 100) { color = '#00B59B'; status = 'Excelente'; } else { color = '#6222EF'; status = 'Insano'; }
-            fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
-        }
-    }
-    function atualizarStatusTemporarias(grupoId, porcentagem) { /* ...código da função... */
-        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
-        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
-        const statusIndicator = document.getElementById(`estado-${grupoId}`);
-        if (fillBar && progressText && statusIndicator) {
-            fillBar.style.width = `${porcentagem}%`; progressText.textContent = `${porcentagem}%`;
-            let color = '', status = '';
-            if (porcentagem <= 0) { color = '#00B59B'; status = 'Nulo'; }
-            else if (porcentagem <= 5) { color = '#00B59B'; status = 'Muito Baixo'; } else if (porcentagem <= 30) { color = 'green'; status = 'Baixo'; }
-            else if (porcentagem <= 60) { color = '#FFAA00'; status = 'Moderado'; } else if (porcentagem <= 95) { color = 'red'; status = 'Alto'; }
-            else { color = 'darkred'; status = 'Crítico'; }
-            fillBar.style.backgroundColor = color; statusIndicator.textContent = status;
-        }
-    }
-    // Chamadas de atualização... (iguais)
-    atualizarStatusBasicas('grupo-higiene', 97); /* ... etc ... */
-    atualizarStatusBasicas('grupo-banheiro', 100); atualizarStatusBasicas('grupo-sono', 100); atualizarStatusBasicas('grupo-fome', 100);
-    atualizarStatusBasicas('grupo-sede', 100); atualizarStatusBasicas('grupo-diversao', 101); atualizarStatusBasicas('grupo-social', 78);
-    atualizarStatusBasicas('grupo-foco', 64); atualizarStatusBasicas('grupo-felicidade', 101); atualizarStatusBasicas('grupo-tesao', 101);
-    atualizarStatusTemporarias('grupo-enjoo', 0); /* ... etc ... */
-    atualizarStatusTemporarias('grupo-fadiga', 0); atualizarStatusTemporarias('grupo-estresse', 0); atualizarStatusTemporarias('grupo-ansiedade', 0);
-    atualizarStatusTemporarias('grupo-medo', 0); atualizarStatusTemporarias('grupo-tedio', 0); atualizarStatusTemporarias('grupo-raiva', 0);
-    atualizarStatusTemporarias('grupo-desgaste', 0);
     
-    // --- AETHER ---
-    function atualizarAether(porcentagem) { /* ...código da função... */
-        const preenchimentoAether = document.getElementById("preenchimentoAether");
-        const textoAether = document.getElementById("textoAether");
-        if (preenchimentoAether && textoAether) {
-            porcentagem = Math.max(0, Math.min(102, porcentagem));
-            preenchimentoAether.style.width = `${(porcentagem / 102) * 100}%`;
-            textoAether.textContent = `Aether: ${porcentagem}%`;
+        // Garante que a porcentagem fique entre 0% e 100%
+        porcentagem = Math.max(0, Math.min(100, porcentagem));
+    
+        // Atualiza a largura da barra
+        barraEA.style.width = `${porcentagem}%`;
+    
+        // Atualiza o texto dentro da barra
+        textoEA.textContent = `EA: ${porcentagem}%`;
+    }
+    
+    // Definir a porcentagem inicial 
+    document.addEventListener('DOMContentLoaded', () => {
+        atualizarEA(86);
+    });
+
+
+    // Função para abrir a janela flutuante
+    function abrirJanelaFilho(id) {
+        const janela = document.getElementById(`janelaFilho${id}`);
+        if (janela) {
+            janela.style.display = 'block';
         }
     }
-    atualizarAether(101);
-
-    document.querySelectorAll('.janela-filho').forEach(addDragEventsToWindow);
-
-
-    // =========================================================================
-    // CARREGAMENTO DAS SEÇÕES DINÂMICAS (HTML EXTERNO)
-    // =========================================================================
-    loadSection("secao-aura", "Seções/1-Aura-Buffy.html", function () {
-        const playerMusicaBuffy = document.querySelector("#janelaMusica iframe");
-        if (playerMusicaBuffy) {
-            playerMusicaBuffy.src = "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1961843283%3Fsecret_token%3Ds-lg9054r5PuH";
-        } else {
-            console.warn("Buffy Música: #janelaMusica iframe não encontrado APÓS carregar secao-aura.");
+    
+    // Função para fechar a janela flutuante
+    function fecharJanelaFilho(id) {
+        const janela = document.getElementById(`janelaFilho${id}`);
+        if (janela) {
+            janela.style.display = 'none';
         }
-    });
+    }
+    
+    // Expande ou minimiza a janela flutuante
+    function expandirJanelaFilho(id) {
+        const janela = document.getElementById(`janelaFilho${id}`);
+        janela.classList.toggle('janela-expandida');
+    }
+    
+    // Necessidades Básicas - Barra de Progresso e Estado
+    function atualizarStatusBasicas(grupoId, porcentagem) {
+        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
+        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
+        const statusIndicator = document.getElementById(`estado-${grupoId}`);
 
+        fillBar.style.width = `${porcentagem}%`;
+        progressText.textContent = `${porcentagem}%`;
+
+        let color = '';
+        let status = '';
+
+        if (porcentagem <= 0) {
+            color = '#00B59B';
+            status = 'Nulo';
+        } else if (porcentagem <= 5) {
+            color = 'darkred';
+            status = 'Crítico';
+        } else if (porcentagem <= 30) {
+            color = 'red';
+            status = 'Baixo';
+        } else if (porcentagem <= 60) {
+            color = '#FFAA00';
+            status = 'Moderado';
+        } else if (porcentagem <= 95) {
+            color = 'green';
+            status = 'Bom';
+        } else if (porcentagem <= 100) {
+            color = '#00B59B';
+            status = 'Excelente';
+        } else {
+            color = '#6222EF';
+            status = 'Insano';
+        }
+
+        fillBar.style.backgroundColor = color;
+        statusIndicator.textContent = status;
+    }
+
+    // Necessidades Temporárias - Barra de Progresso e Estado
+    function atualizarStatusTemporarias(grupoId, porcentagem) {
+        const fillBar = document.getElementById(`barra-progresso-${grupoId}`);
+        const progressText = document.getElementById(`progresso-texto-${grupoId}`);
+        const statusIndicator = document.getElementById(`estado-${grupoId}`);
+
+        fillBar.style.width = `${porcentagem}%`;
+        progressText.textContent = `${porcentagem}%`;
+
+        let color = '';
+        let status = '';
+
+        if (porcentagem <= 0) {
+            color = '#00B59B';
+            status = 'Nulo';
+        } else if (porcentagem <= 5) {
+            color = '#00B59B';
+            status = 'Muito Baixo';
+        } else if (porcentagem <= 30) {
+            color = 'green';
+            status = 'Baixo';
+        } else if (porcentagem <= 60) {
+            color = '#FFAA00';
+            status = 'Moderado';
+        } else if (porcentagem <= 95) {
+            color = 'red';
+            status = 'Alto';
+        } else {
+            color = 'darkred';
+            status = 'Crítico';
+        }
+
+        fillBar.style.backgroundColor = color;
+        statusIndicator.textContent = status;
+    }
+
+    // Exemplo de uso para Necessidades Básicas
+    atualizarStatusBasicas('grupo-higiene', 97);
+    atualizarStatusBasicas('grupo-banheiro', 100);
+    atualizarStatusBasicas('grupo-sono', 100);
+    atualizarStatusBasicas('grupo-fome', 100);
+    atualizarStatusBasicas('grupo-sede', 100);
+    atualizarStatusBasicas('grupo-diversao', 101);
+    atualizarStatusBasicas('grupo-social', 78);
+    atualizarStatusBasicas('grupo-foco', 64);
+    atualizarStatusBasicas('grupo-felicidade', 101);
+    atualizarStatusBasicas('grupo-tesao', 101);
+
+    // Exemplo de uso para Necessidades Temporárias
+    atualizarStatusTemporarias('grupo-enjoo', 0);
+    atualizarStatusTemporarias('grupo-fadiga', 0);
+    atualizarStatusTemporarias('grupo-estresse', 0);
+    atualizarStatusTemporarias('grupo-ansiedade', 0);
+    atualizarStatusTemporarias('grupo-medo', 0);
+    atualizarStatusTemporarias('grupo-tedio', 0);
+    atualizarStatusTemporarias('grupo-raiva', 0);
+    atualizarStatusTemporarias('grupo-desgaste', 0);
+
+    // Define a porcentagem inicial do Aether
+    let porcentagemAether = 101; 
+    
+    // Atualiza a barra de preenchimento e o texto da porcentagem
+    function atualizarAether(porcentagem) {
+        if (porcentagem > 102) porcentagem = 102;
+        if (porcentagem < 0) porcentagem = 0;
+    
+        document.getElementById("preenchimentoAether").style.width = `${(porcentagem / 102) * 100}%`;
+        document.getElementById("textoAether").textContent = `Aether: ${porcentagem}%`;
+    }
+    
+    // Chamada inicial para atualizar a barra ao carregar a página
+    atualizarAether(porcentagemAether);
+
+    // Seções Individuais
+    function loadSection(id, file) {
+        fetch(file)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+            })
+            .catch(error => console.error(`Erro ao carregar ${file}:`, error));
+    }
+    
+    // Carregar todas as seções
+    loadSection("secao-aura", "Seções/1-Aura-Buffy.html");
     loadSection("secao-assimilacao", "Seções/2-Taxa-de-Assimilação.html");
+    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html");
+    loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html");
+    loadSection("secao-classes", "Seções/5-Classes.html");
+    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html");
+    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html");
 
-    loadSection("secao-cabecalho", "Seções/3-Cabeçalho.html", function () {
-        console.log("Seção Cabeçalho carregada!");
-    });
-
-    loadSection("secao-bahdinheiro", "Seções/4-Barra-Dinheiro.html", function () {
-        console.log("Seção Barra de Experiência carregada!");
-        // O erro era aqui: progressBar.closest(...).querySelector(...)
-        // Vamos garantir que progressBar exista e o seletor seja direto.
-        setTimeout(() => {
-            var progressBar = document.getElementById('expBar');
-            if (progressBar) {
-                var percentage = 75;
-                progressBar.style.width = percentage + '%';
-                // Assumindo que .barra-texto é um irmão ou filho direto do container da barra
-                // Se .barra-texto está DENTRO de #expBar, então progressBar.querySelector('.barra-texto')
-                // Se é um irmão, precisa de um seletor a partir de um pai comum.
-                // Se o HTML for <div class="container"><div id="expBar"></div><span class="barra-texto"></span></div>
-                // Então:
-                const containerDaBarra = progressBar.closest('.barra-exp-container'); // Ou qualquer que seja o container
-                if (containerDaBarra) {
-                    const textSpan = containerDaBarra.querySelector('.barra-texto');
-                    if (textSpan) {
-                        textSpan.textContent = '1590 - ' + percentage + '%';
-                    } else {
-                        console.warn("Barra Dinheiro: '.barra-texto' não encontrado dentro do container de 'expBar'.");
-                    }
-                } else {
-                     console.warn("Barra Dinheiro: Container de 'expBar' não encontrado.");
-                }
-            } else {
-                console.warn("Barra Dinheiro: Elemento 'expBar' não encontrado após carregar seção.");
-            }
-        }, 500);
-    });
-
-    loadSection("secao-classes", "Seções/5-Classes.html", function () {
-        console.log("Seção Classes carregada!");
-        // Se o botão que chama `mostrarTexto()` está DENTRO desta seção,
-        // o listener deveria ser adicionado aqui, ex:
-        // const botaoMostrarTexto = document.querySelector('#secao-classes .botao-que-mostra-texto');
-        // if (botaoMostrarTexto) botaoMostrarTexto.addEventListener('click', mostrarTexto);
-        // Se o onclick no HTML já está funcionando com a função global `mostrarTexto`, ok.
-    });
-
-    loadSection("secao-modoempusa", "Seções/6-Modo-Empusa.html", function () {
-        console.log("Seção Modo Empusa carregada!");
-        // Funções de atualização do Modo Empusa (definidas globalmente ou dentro deste callback)
-        function atualizarBarraModoEmpusa(idBarra, idTexto, porcentagem) { /* ... */ }
-        function atualizarFomeModoEmpusa() { /* ... */ }
-        function toggleMenuModoEmpusa(seta) { /* ... */ }
-        function atualizarDorModoEmpusa(nivelDor) { /* ... */ }
-        function atualizarSatisfacaoModoEmpusa(idContainer, idPrefixo, nivelSatisfacao) { /* ... */ }
-        // Copie as definições das funções do Modo Empusa para cá se elas usam elementos SÓ desta seção
-
-        setTimeout(() => {
-            // Chamadas de atualização... (ex: atualizarBarraModoEmpusa(...))
-            // Adicionar listener para .empusa-seta
-            document.querySelectorAll('#secao-modoempusa .empusa-seta').forEach(seta => { // Seletor específico
-                seta.addEventListener('click', function () {
-                    // Precisa da definição de toggleMenuModoEmpusa acessível aqui
-                    var menu = this.parentElement.nextElementSibling;
-                    if (menu && menu.classList.contains('empusa-menu')) {
-                        document.querySelectorAll('#secao-modoempusa .empusa-menu').forEach(m => {
-                            if (m !== menu) m.style.display = 'none';
-                        });
-                        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-                    }
-                });
-            });
-        }, 500);
-    });
-
-    loadSection("secao-modoempusa-alvo", "Seções/7-Modo-Empusa-Alvo.html", function () {
-        console.log("Seção Modo Empusa - Alvo carregada!");
-        // Funções de atualização do Modo Empusa Alvo (definidas globalmente ou dentro deste callback)
-        function atualizarBarraModoEmpusaAlvo(idBarra, idTexto, porcentagem) { /* ... */ }
-        function atualizarDorModoEmpusaAlvo(nivelDor) { /* ... */ }
-        function atualizarDominanciaModoEmpusaAlvo(porcentagem) { /* ... */ }
-        // Copie as definições das funções do Modo Empusa Alvo para cá
-
-        setTimeout(() => {
-            // Chamadas de atualização...
-        }, 500);
-    });
-
-}); // FIM DO DOMContentLoaded
-
-console.log("Script.js carregado e inicializado (com mais correções).");
+    // 
+    function loadSection(id, url, callback) {
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(id).innerHTML = data;
+                if (callback) callback(); // Executa o código após o carregamento
+            })
+            .catch(error => console.error('Erro ao carregar a seção:', error));
+    }
