@@ -905,27 +905,147 @@
     });
 
 
-    // Função para abrir a janela flutuante
-    function abrirJanelaFilho(id) {
-        const janela = document.getElementById(`janelaFilho${id}`);
+        // --- Funções para Janelas dos Filhos ---
+    // Função para abrir a janela flutuante do filho
+    function abrirJanelaFilho(nomeFilho) { // Recebe 'Kaito' ou 'Twenty'
+        const janelaId = `janela${nomeFilho}`; // Forma "janelaKaito" ou "janelaTwenty"
+        const janela = document.getElementById(janelaId);
         if (janela) {
             janela.style.display = 'block';
+        } else {
+            console.error(`Janela com ID ${janelaId} não encontrada.`);
         }
     }
     
-    // Função para fechar a janela flutuante
-    function fecharJanelaFilho(id) {
-        const janela = document.getElementById(`janelaFilho${id}`);
+    // Função para fechar a janela flutuante do filho
+    function fecharJanelaFilho(nomeFilho) {
+        const janelaId = `janela${nomeFilho}`;
+        const janela = document.getElementById(janelaId);
         if (janela) {
             janela.style.display = 'none';
+        } else {
+            console.error(`Janela com ID ${janelaId} não encontrada.`);
         }
     }
     
-    // Expande ou minimiza a janela flutuante
-    function expandirJanelaFilho(id) {
-        const janela = document.getElementById(`janelaFilho${id}`);
-        janela.classList.toggle('janela-expandida');
+    // Expande ou minimiza a janela flutuante do filho
+    function expandirJanelaFilho(nomeFilho) {
+        const janelaId = `janela${nomeFilho}`;
+        const janela = document.getElementById(janelaId);
+        if (janela) {
+            janela.classList.toggle('janela-expandida');
+        } else {
+            console.error(`Janela com ID ${janelaId} não encontrada.`);
+        }
     }
+    // --- FIM Funções para Janelas dos Filhos ---
+        // --- Tornar as Janelas de Filhos Arrastáveis ---
+    document.querySelectorAll('.janela-filhos').forEach((janela) => {
+        let isDragging = false, startX, startY, initialLeft, initialTop;
+        const dragHandle = janela.querySelector('.janela-botoes') || janela; // Usa a barra de botões ou a janela inteira
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                return;
+            }
+            isDragging = true;
+            const styles = window.getComputedStyle(janela);
+            initialLeft = parseInt(styles.left, 10) || 0; // Pega valor atual
+            initialTop = parseInt(styles.top, 10) || 0;   // Pega valor atual
+
+            // Verifica se left/top são NaN e define para posição central se for o caso
+            if (isNaN(initialLeft) || isNaN(initialTop)) {
+                const rect = janela.getBoundingClientRect();
+                const parentRect = janela.parentElement.getBoundingClientRect();
+                initialLeft = rect.left - parentRect.left; // posição relativa ao pai
+                initialTop = rect.top - parentRect.top; // posição relativa ao pai
+            }
+            
+            startX = e.clientX;
+            startY = e.clientY;
+
+            janela.style.cursor = 'grabbing';
+            // Aumenta o z-index para trazer a janela para frente
+            let maxZ = 0;
+            document.querySelectorAll('.janela-filhos, .janela-bencao, .janela-titulos, .janela-estado-civil, .player-musica-isaac').forEach(j => {
+                const z = parseInt(window.getComputedStyle(j).zIndex);
+                if (!isNaN(z) && z > maxZ) {
+                    maxZ = z;
+                }
+            });
+            janela.style.zIndex = maxZ + 1;
+            
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                janela.style.left = `${initialLeft + dx}px`;
+                janela.style.top = `${initialTop + dy}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                janela.style.cursor = 'move';
+            }
+        });
+
+        // Suporte para toque (arraste em dispositivos móveis)
+        dragHandle.addEventListener('touchstart', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                return;
+            }
+            isDragging = true;
+            const styles = window.getComputedStyle(janela);
+            initialLeft = parseInt(styles.left, 10) || 0;
+            initialTop = parseInt(styles.top, 10) || 0;
+
+             if (isNaN(initialLeft) || isNaN(initialTop)) {
+                const rect = janela.getBoundingClientRect();
+                const parentRect = janela.parentElement.getBoundingClientRect();
+                initialLeft = rect.left - parentRect.left; 
+                initialTop = rect.top - parentRect.top;
+            }
+
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            janela.style.cursor = 'grabbing';
+            
+            let maxZ = 0;
+            document.querySelectorAll('.janela-filhos, .janela-bencao, .janela-titulos, .janela-estado-civil, .player-musica-isaac').forEach(j => {
+                const z = parseInt(window.getComputedStyle(j).zIndex);
+                if (!isNaN(z) && z > maxZ) {
+                    maxZ = z;
+                }
+            });
+            janela.style.zIndex = maxZ + 1;
+
+            // Previne o scroll da página enquanto arrasta a janela em touch
+            if (e.cancelable) e.preventDefault();
+        }, { passive: false }); // passive: false é importante para preventDefault funcionar
+
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                const dx = e.touches[0].clientX - startX;
+                const dy = e.touches[0].clientY - startY;
+                janela.style.left = `${initialLeft + dx}px`;
+                janela.style.top = `${initialTop + dy}px`;
+                 if (e.cancelable) e.preventDefault(); // Previne o scroll
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                janela.style.cursor = 'move';
+            }
+        });
+    });
+    // --- FIM Tornar as Janelas de Filhos Arrastáveis ---
     
     // Necessidades Básicas - Barra de Progresso e Estado
     function atualizarStatusBasicas(grupoId, porcentagem) {
