@@ -624,15 +624,15 @@
 
     // Atributos - Definindo valores e porcentagens iniciais para cada atributo
     const atributos = {
-        hp: { total: 4910210, porcentagem: 100 },
-        mp: { total: 823691, porcentagem: 100 },
-        agi: { total: 637369, porcentagem: 100 },
-        def: { total: 1476557, porcentagem: 100 },
-        res: { total: 1331048, porcentagem: 100 },
-        spd: { total: 1020989, porcentagem: 100 },
-        int: { total: 431815, porcentagem: 100 },
-        atk: { total: 2075839, porcentagem: 100 },
-        smp: { total: 291363290, porcentagem: 99.17 },
+        hp: { total: 107.213.695, porcentagem: 100 },
+        mp: { total: 108.186.696, porcentagem: 100 },
+        agi: { total: 97.076.916, porcentagem: 100 },
+        def: { total: 74.513.183, porcentagem: 100 },
+        res: { total: 92.952.262, porcentagem: 100 },
+        spd: { total: 102.243.865, porcentagem: 100 },
+        int: { total: 141.765.533, porcentagem: 100 },
+        atk: { total: 103.774.400, porcentagem: 100 },
+        smp: { total: 584.154.260, porcentagem: 99.17 },
         unknown: { total: 100, porcentagem: 50 }
     };
 
